@@ -786,17 +786,19 @@
        * ⑧ 右栏：顾问 / 医生排行（28~30px 行，首屏 7 行，可滚轮下翻看全部）
        * ══════════════════════════════════════════════════════════ */
       /* 排行面板的排序模式（2026-10-16 需求）：两块面板各自独立，初始「完成率」。
-         pct = 业绩完成率（%）；amount = 业绩（万）；avg = 平均单体（元，2026-10-26 新增）。
+         pct = 业绩完成率（%）；amount = 业绩（万）；target = 业绩目标（万）；
+         avg = 平均单体（元）。后两个 2026-10-26 新增。
          排序状态放在模块级：心跳重渲染（renderRank 被再次调用）时不会丢，
          用户切到「业绩」后一直保持。 */
       const RANK_MODE = { rowsConsult: "pct", rowsDoctor: "pct" };
       const RANK_ITEMS = {}; // containerId → 最近一次的数据，供按钮切换时原地重排
       /* 每行的「条形 + 行尾数字」（2026-10-26 需求）：
          数字一律贴到行最右，条形从姓名右侧一直铺到数字前 —— 即原来「业绩」那一列
-         的位置也让给条形了。三种模式的条形与行尾数字永远是同一个指标，
+         的位置也让给条形了。四种模式的条形与行尾数字永远是同一个指标，
          不会出现「条形看完成率、数字看业绩」的口径分裂：
            pct    绝对百分比，100% 封顶（完成率超过 100% 的条不再溢出）
            amount 占本列表最大业绩的比例（排序榜=相对长度，第一名必满格）
+           target 占本列表最大业绩目标的比例（同上）
            avg    占本列表最大平均单体的比例（同上） */
       const RANK_METRIC = {
         pct: {
@@ -809,6 +811,12 @@
           val: (p) => p.amount,
           max: (list) => Math.max(...list.map((p) => p.amount), 1e-6),
           text: (p) => fmtW(p.amount),
+          unit: "单位：万元",
+        },
+        target: {
+          val: (p) => p.target,
+          max: (list) => Math.max(...list.map((p) => p.target), 1e-6),
+          text: (p) => fmtW(p.target),
           unit: "单位：万元",
         },
         avg: {
@@ -826,13 +834,16 @@
         RANK_ITEMS[containerId] = src;
         const by = RANK_MODE[containerId] || "pct";
         /* 按当前模式降序；主指标并列时用另一个指标兜底，
-           避免一堆 0.00% 的人每次心跳顺序乱跳（B 端看板最忌行号漂移）。 */
+           避免一堆 0.00% 的人每次心跳顺序乱跳（B 端看板最忌行号漂移）。
+           「目标」并列很常见（同店同档目标），故兜底用业绩，其次完成率。 */
         const list = [...src].sort((a, b) =>
           by === "amount"
             ? b.amount - a.amount || b.pct - a.pct
-            : by === "avg"
-              ? b.avgTicket - a.avgTicket || b.pct - a.pct
-              : b.pct - a.pct || b.amount - a.amount,
+            : by === "target"
+              ? b.target - a.target || b.amount - a.amount || b.pct - a.pct
+              : by === "avg"
+                ? b.avgTicket - a.avgTicket || b.pct - a.pct
+                : b.pct - a.pct || b.amount - a.amount,
         );
         const colorOf = (p) =>
           (STORES.find((s) => s.name === p.store) || {}).color || "#d4af37";

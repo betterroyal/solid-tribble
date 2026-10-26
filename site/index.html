@@ -31,7 +31,7 @@
     底部折线，页面不重载。历史日序列固定，增长落在「今天」的
     数据点上；左下角有心跳指示器（倒计时 + 刷新闪烁）。
   ============================================================-->
-        <link rel="stylesheet" href="app/css/style.css?v=20261026-01" />
+        <link rel="stylesheet" href="app/css/style.css?v=20261026-02" />
   </head>
   <body data-page-node-id="v0FKEsf7Q6nRDLdoApuXJm">
     <div id="stage" data-page-node-id="kpHgrNEEkZe6PAno3AZiqG">
@@ -402,12 +402,14 @@
           <span class="hline" data-page-node-id="BKbFTxDVNHv76pxE9Rf3qr"></span>
           <!-- 2026-10-16 需求：右上角标签下方加排序切换（完成率 / 业绩），初始「完成率」。
                tag 与 .seg 一起竖着排在 .hd-col 里，右缘与原来「累计万元」位置一致。
-               2026-10-26 需求：BI「咨询数据」新增「平均单体」列 → 按钮追加在最后
-               （业绩 / 完成率 / 平均单体），点它时行尾数字与条形都改用平均单体。 -->
+               2026-10-26 需求：BI「咨询数据」新增「平均单体」列 → 按钮追加在最后；
+               再加一枚「目标」（显示业绩目标，同「业绩」一样是万元口径），
+               放在「业绩」后面 —— 两块面板前三枚按钮位置保持一致。 -->
           <div class="hd-col">
             <span class="tag" id="tagConsult" data-page-node-id="scFnl15bqPgjUEw5bwAO5I">全部 16 人 · 完成率</span>
             <div class="seg" data-rank="rowsConsult">
               <button type="button" class="seg-btn" data-by="amount">业绩</button>
+              <button type="button" class="seg-btn" data-by="target">目标</button>
               <button type="button" class="seg-btn on" data-by="pct">完成率</button>
               <button type="button" class="seg-btn" data-by="avg">平均单体</button>
             </div>
@@ -424,11 +426,14 @@
         <div class="panel-hd" data-page-node-id="IjDSf5qnbT3bcYrxnxmnRA">
           <h3 data-page-node-id="Q0sSzF1gGajtAcdxzGbIRA">医生业绩</h3>
           <span class="hline" data-page-node-id="9EmBxb9q80FfxQWtfCSAIh"></span>
-          <!-- 与「健康顾问业绩」同构（2026-10-16）：两块面板的排序各自独立，互不影响。 -->
+          <!-- 与「健康顾问业绩」同构（2026-10-16）：两块面板的排序各自独立，互不影响。
+               2026-10-26：同样加「目标」按钮（业绩 / 目标 / 完成率）；
+               医生表没有「平均单体」列，所以不出第四枚按钮。 -->
           <div class="hd-col">
             <span class="tag" id="tagDoctor" data-page-node-id="x02npfRNWDVHyEkIwSiJ5l">全部 38 人 · 完成率</span>
             <div class="seg" data-rank="rowsDoctor">
               <button type="button" class="seg-btn" data-by="amount">业绩</button>
+              <button type="button" class="seg-btn" data-by="target">目标</button>
               <button type="button" class="seg-btn on" data-by="pct">完成率</button>
             </div>
           </div>
@@ -531,7 +536,7 @@
       </div>
     </div>
 
-        <script src="app/js/data.js?v=20261026-01"></script>
-    <script type="module" src="app/js/main.js?v=20261026-01"></script>
+        <script src="app/js/data.js?v=20261026-02"></script>
+    <script type="module" src="app/js/main.js?v=20261026-02"></script>
   </body>
 </html>

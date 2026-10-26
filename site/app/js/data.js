@@ -349,13 +349,15 @@
        这里仍按金额降序排一份「出厂顺序」，实际展示顺序由 main.js 的 RANK_MODE 决定。
        2026-10-26：BI「咨询数据」新增「平均单体」列（元），一并带进排行模型，
        供「健康顾问业绩」面板的第三个排序按钮（平均单体）使用。
-       医生表没有该列 → num(undefined) = 0，医生面板不出这个按钮，也不受影响。 ── */
+       医生表没有该列 → num(undefined) = 0，医生面板不出这个按钮，也不受影响。
+       同日再加「业绩目标」（万）—— 两块面板都有的原生列，供「目标」按钮使用。 ── */
     const rankAll = (rows, nameKey, amtKey) =>
       rows
         .map((r) => ({
           name: r[nameKey],
           pct: num(r["业绩完成率"]) * 100, // 百分数，如 44.4
           amount: num(r[amtKey]) / 1e4, // 万
+          target: num(r["业绩目标"]) / 1e4, // 业绩目标（元 → 万）
           avgTicket: num(r["平均单体"]), // 平均单体（元，BI 原生列；医生表没有 → 0）
         }))
         .sort((a, b) => b.amount - a.amount);
