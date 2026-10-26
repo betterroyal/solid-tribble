@@ -705,22 +705,23 @@
        *      BI 没有这个指标；现在换成 BI 原生的初诊三件套，不再依赖手填值。）
        * ══════════════════════════════════════════════════════════ */
       /* ── 左栏两栏的排序（2026-10-26 需求）──
-         业绩进度：目标 / 业绩 / 完成率 / 平均单体；初诊进度：目标 / 初诊 / 完成率。
+         业绩进度：业绩 / 完成率 / 平均单体（「目标」已按要求先隐藏，能力保留）；
+         初诊进度：初诊 / 完成率（同上）。
          点按钮 = 按该指标降序重排 + 行内对应的那个数字变金色加粗
          （与默认的完成率同一套格式，其余数字保持小字灰色）。
-         初始不排序：仍是 MODEL.stores 的门店固定顺序 —— 2026-10-16 需求要求两栏逐行
-         对齐便于对照，所以只有用户点过按钮（STORE_SORT_ON=true）才开始按指标降序。 */
+         2026-10-26 追加需求：**打开页面就按完成率降序**（不再是门店固定顺序），
+         所以 STORE_SORT_ON 初始为 true；两栏因此不再逐行对齐（旧的对齐需求作废）。 */
       const STORE_SORT = { rowsRev: "pct", rowsRevisit: "pct" };
-      const STORE_SORT_ON = { rowsRev: false, rowsRevisit: false };
+      const STORE_SORT_ON = { rowsRev: true, rowsRevisit: true };
       /* 每个面板可选指标的取数口径 + 该指标在行内对应哪个数字（hl）：
          amount → 「实收 53.48」/「初诊 282」；target → 「/ 目标 65.00」；
-         pct → 行尾百分比；avg（平均单体）行内没有对应数字 → hl:null，只参与排序。 */
+         pct → 行尾百分比；avg → 行内末尾临时补一段「· 单体 3,080.10」并高亮它。 */
       const STORE_METRIC = {
         rowsRev: {
           target: { val: (s) => s.targetBase, hl: "target" },
           amount: { val: (s) => s.actual, hl: "amount" },
           pct: { val: (s) => s.revPct, hl: "pct" },
-          avg: { val: (s) => s.avgTicket, hl: null },
+          avg: { val: (s) => s.avgTicket, hl: "avg" },
         },
         rowsRevisit: {
           target: { val: (s) => s.initBase, hl: "target" },
@@ -730,7 +731,8 @@
       };
       const storeMetric = (id) =>
         (STORE_METRIC[id] || {})[STORE_SORT[id]] || STORE_METRIC[id].pct;
-      /* 该面板当前应显示的门店顺序：没点过按钮 → 原样；点过 → 按当前指标降序 */
+      /* 该面板当前应显示的门店顺序：按当前指标降序（STORE_SORT_ON 为 false 时保持原序，
+         目前两个面板都是 true，留这个开关是为了以后想回到"门店固定顺序"能一键改回） */
       const storeOrder = (id, list) => {
         if (!STORE_SORT_ON[id]) return list;
         const mt = storeMetric(id);
@@ -742,6 +744,12 @@
       /* 行尾百分比：只有完成率是当前指标时才金色加粗 */
       const spPct = (id, pct) =>
         `<span class="sp-pct${storeMetric(id).hl === "pct" ? " on" : ""}">${pct.toFixed(2)}%</span>`;
+      /* 「平均单体」是唯一没有行内位置的指标：选中时才在行尾追加「 · 单体 X」并高亮，
+         其余模式下这段不出现 —— 行内文字保持原样（2026-10-26 需求）。 */
+      const spAvg = (id, s) =>
+        storeMetric(id).hl === "avg"
+          ? ` · ${spNum(id, "avg", "单体 " + fmtY(s.avgTicket))}`
+          : "";
 
       function renderRevRows(m, setW) {
         /* 2026-10-16 需求：
@@ -760,7 +768,7 @@
               <div class="sp-l1">
                 <span class="dot" style="background:${s.color}"></span>
                 <span class="sp-name">${s.name}</span>
-                <span class="sp-meta">实收 ${spNum(id, "amount", fmtW(s.actual))} / 目标 ${spNum(id, "target", fmtW(s.targetBase))}</span>
+                <span class="sp-meta">实收 ${spNum(id, "amount", fmtW(s.actual))} / 目标 ${spNum(id, "target", fmtW(s.targetBase))}${spAvg(id, s)}</span>
               </div>
               <div class="sp-bar-wrap">
                 <span class="sp-bar"><i data-w="${clamp(s.revPct, 0, 100).toFixed(1)}"></i></span>
@@ -794,7 +802,7 @@
         list.forEach((s, i) => {
           const row = rows[i];
           row.querySelector(".sp-meta").innerHTML =
-            `实收 ${spNum(id, "amount", fmtW(s.actual))} / 目标 ${spNum(id, "target", fmtW(s.targetBase))}`;
+            `实收 ${spNum(id, "amount", fmtW(s.actual))} / 目标 ${spNum(id, "target", fmtW(s.targetBase))}${spAvg(id, s)}`;
           row.querySelector(".sp-bar i").style.width =
             clamp(s.revPct, 0, 100).toFixed(1) + "%";
           const pctEl = row.querySelector(".sp-pct");
@@ -814,8 +822,8 @@
          2026-10-16 需求：门店顺序不再按初诊完成率降序，改为与上方「业绩进度」
          面板完全一致的 MODEL.stores 原始顺序（神华/九星/青东/包百/校园/医院），
          两栏逐行一一对应，便于左右对照。
-         2026-10-26：用户点过排序按钮后，这里才按所选指标降序（见 storeOrder）；
-         没点过时仍是原始顺序，保持两栏对齐。 */
+         2026-10-26 追加需求：打开页面就按完成率降序，两栏不再逐行对齐（对齐需求作废），
+         排序口径见 storeOrder（点按钮可切到目标/初诊/完成率）。 */
       function renderRevisitRows(m, setW) {
         const id = "rowsRevisit";
         $("rowsRevisit").innerHTML = storeOrder(id, m.stores)
