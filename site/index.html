@@ -31,7 +31,7 @@
     底部折线，页面不重载。历史日序列固定，增长落在「今天」的
     数据点上；左下角有心跳指示器（倒计时 + 刷新闪烁）。
   ============================================================-->
-        <link rel="stylesheet" href="app/css/style.css?v=20261026-04" />
+        <link rel="stylesheet" href="app/css/style.css?v=20261026-05" />
   </head>
   <body data-page-node-id="v0FKEsf7Q6nRDLdoApuXJm">
     <div id="stage" data-page-node-id="kpHgrNEEkZe6PAno3AZiqG">
@@ -196,8 +196,19 @@
           <h3 data-page-node-id="QozZiLu8bZZRKTjCXXU3ck">业绩进度</h3>
           <span class="hline" data-page-node-id="J2i0PtmHDQrnvhUNHukCvz"></span>
           <!-- 2026-10-16：删掉「· 条形对冲刺目标」（条形不再对冲刺目标，改为直接对基础目标），
-               只留「单位：万元」；.panel-hd 是 flex，.hline flex:1 会把 .tag 顶到面板最右侧。 -->
-          <span class="tag" data-page-node-id="NDKkVHRwoWOS1iuBsFXWVc">单位：万元</span>
+               只留「单位：万元」；.panel-hd 是 flex，.hline flex:1 会把 .tag 顶到面板最右侧。
+               2026-10-26 需求：加排序按钮（目标 / 业绩 / 完成率 / 平均单体，初始「完成率」），
+               与右栏两块排行面板同一套 .hd-col + .seg 结构；点按钮按该指标降序，
+               并把行内对应的数字变金色加粗（数据口径见 main.js 的 STORE_METRIC）。 -->
+          <div class="hd-col">
+            <span class="tag" data-page-node-id="NDKkVHRwoWOS1iuBsFXWVc">单位：万元</span>
+            <div class="seg" data-sort="rowsRev">
+              <button type="button" class="seg-btn" data-by="target">目标</button>
+              <button type="button" class="seg-btn" data-by="amount">业绩</button>
+              <button type="button" class="seg-btn on" data-by="pct">完成率</button>
+              <button type="button" class="seg-btn" data-by="avg">平均单体</button>
+            </div>
+          </div>
         </div>
         <div class="sp-rows" id="rowsRev" data-page-node-id="oeGaWgf1RTmptFVPS90v6Z"></div>
       </section>
@@ -210,7 +221,17 @@
         <div class="panel-hd" data-page-node-id="XFnaBUeVZULKzVKaM9sH7n">
           <h3 data-page-node-id="4meOhcFOpAJur4xcxxRGqE">初诊进度</h3>
           <span class="hline" data-page-node-id="DszTDeYF3ndCC9vCzuFB1k"></span>
-          <span class="tag" id="tagRevisit" data-page-node-id="RQ2RITb6IYQIkKLbBFJFOM">单位：人</span>
+          <!-- 2026-10-26 需求：加排序按钮（目标 / 初诊 / 完成率，初始「完成率」）。
+               这块是人数口径，中间那枚按用户确认叫「初诊」（＝行内的「初诊 282」），
+               点它按初诊到诊人数降序并高亮该数字；不叫「业绩」以免和金额口径混。 -->
+          <div class="hd-col">
+            <span class="tag" id="tagRevisit" data-page-node-id="RQ2RITb6IYQIkKLbBFJFOM">单位：人</span>
+            <div class="seg" data-sort="rowsRevisit">
+              <button type="button" class="seg-btn" data-by="target">目标</button>
+              <button type="button" class="seg-btn" data-by="amount">初诊</button>
+              <button type="button" class="seg-btn on" data-by="pct">完成率</button>
+            </div>
+          </div>
         </div>
         <div class="sp-rows" id="rowsRevisit" data-page-node-id="FMGkPWljnkzDIOqVaobHqA"></div>
       </section>
@@ -538,7 +559,7 @@
       </div>
     </div>
 
-        <script src="app/js/data.js?v=20261026-04"></script>
-    <script type="module" src="app/js/main.js?v=20261026-04"></script>
+        <script src="app/js/data.js?v=20261026-05"></script>
+    <script type="module" src="app/js/main.js?v=20261026-05"></script>
   </body>
 </html>

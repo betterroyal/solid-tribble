@@ -704,38 +704,97 @@
        *    （2026-09-29 前这里是"复诊到店率"，用的是 CONFIG 里手填的 revisit，
        *      BI 没有这个指标；现在换成 BI 原生的初诊三件套，不再依赖手填值。）
        * ══════════════════════════════════════════════════════════ */
-      function renderRevRows(m) {
+      /* ── 左栏两栏的排序（2026-10-26 需求）──
+         业绩进度：目标 / 业绩 / 完成率 / 平均单体；初诊进度：目标 / 初诊 / 完成率。
+         点按钮 = 按该指标降序重排 + 行内对应的那个数字变金色加粗
+         （与默认的完成率同一套格式，其余数字保持小字灰色）。
+         初始不排序：仍是 MODEL.stores 的门店固定顺序 —— 2026-10-16 需求要求两栏逐行
+         对齐便于对照，所以只有用户点过按钮（STORE_SORT_ON=true）才开始按指标降序。 */
+      const STORE_SORT = { rowsRev: "pct", rowsRevisit: "pct" };
+      const STORE_SORT_ON = { rowsRev: false, rowsRevisit: false };
+      /* 每个面板可选指标的取数口径 + 该指标在行内对应哪个数字（hl）：
+         amount → 「实收 53.48」/「初诊 282」；target → 「/ 目标 65.00」；
+         pct → 行尾百分比；avg（平均单体）行内没有对应数字 → hl:null，只参与排序。 */
+      const STORE_METRIC = {
+        rowsRev: {
+          target: { val: (s) => s.targetBase, hl: "target" },
+          amount: { val: (s) => s.actual, hl: "amount" },
+          pct: { val: (s) => s.revPct, hl: "pct" },
+          avg: { val: (s) => s.avgTicket, hl: null },
+        },
+        rowsRevisit: {
+          target: { val: (s) => s.initBase, hl: "target" },
+          amount: { val: (s) => initActualOf(s), hl: "amount" },
+          pct: { val: (s) => s.initPct, hl: "pct" },
+        },
+      };
+      const storeMetric = (id) =>
+        (STORE_METRIC[id] || {})[STORE_SORT[id]] || STORE_METRIC[id].pct;
+      /* 该面板当前应显示的门店顺序：没点过按钮 → 原样；点过 → 按当前指标降序 */
+      const storeOrder = (id, list) => {
+        if (!STORE_SORT_ON[id]) return list;
+        const mt = storeMetric(id);
+        return [...list].sort((a, b) => mt.val(b) - mt.val(a));
+      };
+      /* 行内数字：命中当前指标就套 .sp-hl（金色加粗），其余原样输出 */
+      const spNum = (id, key, text) =>
+        storeMetric(id).hl === key ? `<b class="sp-hl">${text}</b>` : text;
+      /* 行尾百分比：只有完成率是当前指标时才金色加粗 */
+      const spPct = (id, pct) =>
+        `<span class="sp-pct${storeMetric(id).hl === "pct" ? " on" : ""}">${pct.toFixed(2)}%</span>`;
+
+      function renderRevRows(m, setW) {
         /* 2026-10-16 需求：
            ① 行内小字不再带「万」（面板头已写明「单位：万元」）；
            ② 条形改为直接表示正常完成率（实收 ÷ 基础 = s.revPct），
               并删掉白色的基础目标刻度 —— 原先条形是对「冲刺目标（基础×1.18）」画、
               刻度恒停在 84.7%，与右侧的完成率百分比是两个口径，容易误读，已废弃。
               副作用修正：基础为 0 的门店（如三级医院）原先 0÷0 被钳成满条，
-              现在按完成率 0.00% 显示为空条，与右侧百分比一致。 */
-        $("rowsRev").innerHTML = m.stores
+              现在按完成率 0.00% 显示为空条，与右侧百分比一致。
+           2026-10-26：行序/高亮走上面的 STORE_METRIC（点按钮排序用），
+           行首加 data-name —— 心跳时据此判断行序有没有变，变了就整块重画。 */
+        const id = "rowsRev";
+        $("rowsRev").innerHTML = storeOrder(id, m.stores)
           .map(
-            (s) => `<div class="sp-row">
+            (s) => `<div class="sp-row" data-name="${s.name}">
               <div class="sp-l1">
                 <span class="dot" style="background:${s.color}"></span>
                 <span class="sp-name">${s.name}</span>
-                <span class="sp-meta">实收 ${fmtW(s.actual)} / 目标 ${fmtW(s.targetBase)}</span>
+                <span class="sp-meta">实收 ${spNum(id, "amount", fmtW(s.actual))} / 目标 ${spNum(id, "target", fmtW(s.targetBase))}</span>
               </div>
               <div class="sp-bar-wrap">
                 <span class="sp-bar"><i data-w="${clamp(s.revPct, 0, 100).toFixed(1)}"></i></span>
               </div>
-              <span class="sp-pct">${s.revPct.toFixed(2)}%</span>
+              ${spPct(id, s.revPct)}
             </div>`,
           )
           .join("");
+        // setW=true：点排序按钮 / 心跳重画后直接落位（首次进入交给 entrance 统一铺开）
+        if (setW)
+          $("rowsRev")
+            .querySelectorAll("i[data-w]")
+            .forEach((el) => (el.style.width = el.dataset.w + "%"));
       }
       renderRevRows(MODEL);
-      /* 心跳：门店顺序固定 → 原地更新，条形走 CSS 过渡、百分比走数字滚动 */
+      /* 心跳：行序没变 → 原地更新，条形走 CSS 过渡、百分比走数字滚动；
+         行序变了（排序模式下某店被反超）→ 整块重画，否则按下标写会把数字写到别人身上。 */
       function updateRevRows(m, animate) {
-        const rows = $("rowsRev").children;
-        m.stores.forEach((s, i) => {
+        const id = "rowsRev";
+        const list = storeOrder(id, m.stores);
+        const box = $("rowsRev");
+        const sameOrder =
+          box.children.length === list.length &&
+          list.every((s, i) => box.children[i] && box.children[i].dataset.name === s.name);
+        if (!sameOrder) {
+          renderRevRows(m, true);
+          beatFade(box);
+          return;
+        }
+        const rows = box.children;
+        list.forEach((s, i) => {
           const row = rows[i];
-          row.querySelector(".sp-meta").textContent =
-            `实收 ${fmtW(s.actual)} / 目标 ${fmtW(s.targetBase)}`;
+          row.querySelector(".sp-meta").innerHTML =
+            `实收 ${spNum(id, "amount", fmtW(s.actual))} / 目标 ${spNum(id, "target", fmtW(s.targetBase))}`;
           row.querySelector(".sp-bar i").style.width =
             clamp(s.revPct, 0, 100).toFixed(1) + "%";
           const pctEl = row.querySelector(".sp-pct");
@@ -755,23 +814,24 @@
          2026-10-16 需求：门店顺序不再按初诊完成率降序，改为与上方「业绩进度」
          面板完全一致的 MODEL.stores 原始顺序（神华/九星/青东/包百/校园/医院），
          两栏逐行一一对应，便于左右对照。
-         ⚠ 别再在这里 sort —— 排序会让两栏行号错位。 */
+         2026-10-26：用户点过排序按钮后，这里才按所选指标降序（见 storeOrder）；
+         没点过时仍是原始顺序，保持两栏对齐。 */
       function renderRevisitRows(m, setW) {
-        const list = m.stores;
-        $("rowsRevisit").innerHTML = list
+        const id = "rowsRevisit";
+        $("rowsRevisit").innerHTML = storeOrder(id, m.stores)
           .map((s) => {
             const done = fmtI(initActualOf(s)),
               goal = fmtI(s.initBase);
-            return `<div class="sp-row">
+            return `<div class="sp-row" data-name="${s.name}">
               <div class="sp-l1">
                 <span class="dot" style="background:${s.color}"></span>
                 <span class="sp-name">${s.name}</span>
-                <span class="sp-meta">初诊 ${done} / 目标 ${goal}</span>
+                <span class="sp-meta">初诊 ${spNum(id, "amount", done)} / 目标 ${spNum(id, "target", goal)}</span>
               </div>
               <div class="sp-bar-wrap">
                 <span class="sp-bar"><i data-w="${clamp(s.initPct, 0, 100).toFixed(1)}"></i></span>
               </div>
-              <span class="sp-pct">${s.initPct.toFixed(2)}%</span>
+              ${spPct(id, s.initPct)}
             </div>`;
           })
           .join("");
@@ -781,6 +841,25 @@
             .forEach((el) => (el.style.width = el.dataset.w + "%"));
       }
       renderRevisitRows(MODEL, false);
+      /* 左栏两栏的排序按钮（2026-10-26 需求）：点哪个指标，就按它降序重排该面板，
+         行内对应数字变金色加粗；两块面板各自独立，互不影响。 */
+      document.querySelectorAll(".seg[data-sort]").forEach((seg) => {
+        seg.addEventListener("click", (e) => {
+          const btn = e.target.closest(".seg-btn");
+          if (!btn) return;
+          const id = seg.dataset.sort;
+          const by = btn.dataset.by;
+          if (STORE_SORT_ON[id] && STORE_SORT[id] === by) return; // 已是该模式
+          STORE_SORT[id] = by;
+          STORE_SORT_ON[id] = true;
+          seg
+            .querySelectorAll(".seg-btn")
+            .forEach((b) => b.classList.toggle("on", b === btn));
+          if (id === "rowsRev") renderRevRows(MODEL, true);
+          else renderRevisitRows(MODEL, true);
+          beatFade($(id));
+        });
+      });
 
       /* ══════════════════════════════════════════════════════════
        * ⑧ 右栏：顾问 / 医生排行（28~30px 行，首屏 7 行，可滚轮下翻看全部）
