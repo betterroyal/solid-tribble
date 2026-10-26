@@ -340,15 +340,20 @@
         return `<table class="more-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
       };
       const moreMask = $("moreMask");
-      const openMore = (title, secs) => {
+      /* html 优先：给了就直接当弹窗正文（「激励排名」这类自绘表格用），
+         否则按 secs 拼成「小标题 + 原始表」的多段结构（网电/市场明细用）。 */
+      const openMore = (title, secs, html) => {
         $("moreTitle").textContent = title;
-        $("moreBody").innerHTML = secs
-          .map(
-            (s) =>
-              `<div class="more-sec-title">${s.title}</div>` +
-              tableHTML(MODEL.tables && MODEL.tables[s.key]),
-          )
-          .join("");
+        $("moreBody").innerHTML =
+          html != null
+            ? html
+            : secs
+                .map(
+                  (s) =>
+                    `<div class="more-sec-title">${s.title}</div>` +
+                    tableHTML(MODEL.tables && MODEL.tables[s.key]),
+                )
+                .join("");
         moreMask.hidden = false;
       };
       const closeMore = () => {
@@ -373,6 +378,38 @@
           { title: "市场各小组数据", key: "groups" },
         ]),
       );
+      /* ── 「激励排名」弹窗（2026-10-26 需求）──
+         数据是 BI 三张周排名表并出来的（data.js 的 buildIncentive），
+         一张表按周分组、周内固定三行：健康顾问完成率 / 健康顾问单体 / 机构周业绩。
+         周次列用 rowspan 合并，与原型一致。 */
+      /* 值的格式化：pct 在 data.js 里已经统一成百分数（小数口径 ×100），这里只补符号；
+         money 是元，走全局的两位小数格式。 */
+      const incValue = (v, kind) =>
+        kind === "money" ? fmtY(v) : `${Number(v).toFixed(2)}%`;
+      const incentiveHTML = () => {
+        const inc = (MODEL && MODEL.incentive) || {};
+        const rows = inc.rows || [];
+        if (!rows.length)
+          return `<p class="more-empty">暂无数据 —— BI 的三张周排名表还没取到（门店数据-完成率排名 / 咨询数据-完成率排名 / 咨询数据-平均单体排名），等下一次数据刷新后再看。</p>`;
+        const counts = {};
+        rows.forEach((r) => (counts[r.week] = (counts[r.week] || 0) + 1));
+        const shown = {};
+        const body = rows
+          .map((r) => {
+            const first = !shown[r.week];
+            shown[r.week] = true;
+            const weekCell = first
+              ? `<td class="wk" rowspan="${counts[r.week]}">${r.week}</td>`
+              : "";
+            return `<tr>${weekCell}<td class="item">${r.label}</td><td class="who">${r.who}</td><td class="num">${incValue(r.value, r.kind)}</td></tr>`;
+          })
+          .join("");
+        return `<table class="more-table inc-table">
+          <thead><tr><th>周次</th><th>激励项目</th><th>激励对象</th><th>详细数据</th></tr></thead>
+          <tbody>${body}</tbody></table>`;
+      };
+      const incBtn = $("btnIncentive");
+      if (incBtn) incBtn.addEventListener("click", () => openMore("激励排名（周）", null, incentiveHTML()));
       function updateChips(m) {
         (m.channelCards || []).forEach((card, ci) => {
           card.items.forEach((c, i) => {

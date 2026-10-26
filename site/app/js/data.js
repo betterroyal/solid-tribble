@@ -125,13 +125,98 @@
 
   const num = (v) => (v === "" || v == null || isNaN(+v) ? 0 : +v);
 
+  /* 激励榜单的三类奖项：key = ranks 里的表键；label = 弹窗里显示的项目名；
+     kind 决定值的格式化（pct 百分比 / money 元）。
+     顺序即弹窗里的行序（用户给的原型就是这个顺序）。 */
+  const INCENTIVE_ITEMS = [
+    { key: "consult", label: "健康顾问完成率第一名", nameRe: /咨询人员|咨询|姓名/, valRe: /完成率/, kind: "pct" },
+    { key: "ticket", label: "健康顾问单体第一名", nameRe: /咨询人员|咨询|姓名/, valRe: /平均单体/, kind: "money" },
+    { key: "store", label: "机构周业绩第一名", nameRe: /门店/, valRe: /完成率/, kind: "pct" },
+  ];
+
+  /* 三张周排名表 → { weeks:[{week,date,count}], rows:[{week,label,who,value,kind}], empty }
+     按周合并；周的排序优先用「年周_时间」，没有日期就按周序号。 */
+  function buildIncentive(ranks) {
+    const colOf = (raw, res) => {
+      const cols = (raw && raw.columns) || [];
+      for (const re of res) {
+        const c = cols.find((x) => re.test(String(x)));
+        if (c) return c;
+      }
+      return null;
+    };
+    const byWeek = new Map();
+    INCENTIVE_ITEMS.forEach((item) => {
+      const raw = ranks[item.key];
+      if (!raw || !(raw.rows || []).length) return;
+      /* ⚠ 周列不能简单用 /周/ 找：门店表的列是 [行号, 年周_时间, 门店, 业绩完成率]，
+         /周/ 会先命中「年周_时间」，把日期当成周次，结果每周都被拆成单独一"周"。
+         所以先排除日期列，再找 周数/行号。 */
+      const weekCol =
+        colOf(raw, [/^(?!.*(年周|时间|日期)).*周/]) || colOf(raw, [/行号/]);
+      const dateCol = colOf(raw, [/年周/, /时间/, /日期/]);
+      const nameCol = colOf(raw, [item.nameRe]);
+      const valCol = colOf(raw, [item.valRe]);
+      if (!nameCol || !valCol) return;
+      /* 完成率口径：这几张周排名表 BI 给的都是 0~1 的小数（1.663 = 166.3%）。
+         按整列最大值判断 —— 全列都 ≤10 一定是小数口径（百分数口径会出现 100+ 的值），
+         比逐值判断安全：1.663 这种"看着像百分数"的小数不会再被当成 1.66%。 */
+      const nums = (raw.rows || []).map((r) => num(r[valCol]));
+      const pctK = item.kind === "pct" && Math.max(...nums, 0) <= 10 ? 100 : 1;
+      (raw.rows || []).forEach((r, i) => {
+        const who = r[nameCol] == null ? "" : String(r[nameCol]).trim();
+        if (!who) return; // 空行跳过（BI 末尾常有合计/空白行）
+        const wRaw = weekCol ? String(r[weekCol] == null ? "" : r[weekCol]).trim() : "";
+        /* 周键：优先取「第N周」里的数字，两张表写法略有差异（第1周 / 第 1 周）也能并到同一周 */
+        const digits = /(\d+)/.exec(wRaw);
+        const wKey = digits ? "w" + digits[1] : wRaw || "w" + (i + 1);
+        const dateStr = dateCol ? String(r[dateCol] == null ? "" : r[dateCol]).trim() : "";
+        const d = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(dateStr);
+        const order = d ? Date.UTC(+d[1], +d[2] - 1, +d[3]) : 0;
+        if (!byWeek.has(wKey))
+          byWeek.set(wKey, {
+            week: wRaw || `第${i + 1}周`,
+            date: dateStr,
+            order,
+            items: [],
+          });
+        byWeek.get(wKey).items.push({
+          label: item.label,
+          who,
+          value: num(r[valCol]) * pctK,
+          kind: item.kind,
+        });
+      });
+    });
+    /* 周升序；没有日期的周排在最后（order=0），再用周序号兜底 */
+    const weeks = [...byWeek.entries()]
+      .map(([key, w]) => ({ key, ...w }))
+      .sort((a, b) => {
+        const na = +(/(\d+)/.exec(a.week) || [])[1] || 0;
+        const nb = +(/(\d+)/.exec(b.week) || [])[1] || 0;
+        return a.order - b.order || na - nb;
+      });
+    const rank = (label) => INCENTIVE_ITEMS.findIndex((x) => x.label === label);
+    const rows = [];
+    weeks.forEach((w) => {
+      w.items.sort((a, b) => rank(a.label) - rank(b.label));
+      w.items.forEach((it) => rows.push({ week: w.week, ...it }));
+      w.count = w.items.length;
+    });
+    return {
+      weeks: weeks.map((w) => ({ week: w.week, date: w.date, count: w.count })),
+      rows,
+      empty: !rows.length,
+    };
+  }
+
   /* 当前北京时间：页面跑在浏览器里，用本机时间 + 时区偏移换算，避免看的人时区不同导致活动窗口算错 */
   function cnNow() {
     const now = new Date();
     return new Date(now.getTime() + (480 + now.getTimezoneOffset()) * 60000);
   }
 
-  function buildModel(storesRaw, consultsRaw, doctorsRaw, chanRaws, dailyRaw, groupsRaw) {
+  function buildModel(storesRaw, consultsRaw, doctorsRaw, chanRaws, dailyRaw, groupsRaw, rankRaws) {
     /* ── 活动进程：BI"天数/时间进度"列 = 第 N 天 / 共 31 天 ── */
     const D = 31;
     const T = Math.min(
@@ -366,6 +451,19 @@
       doctors: rankAll(doctorsRaw.rows, "医生", "医生业绩"),
     };
 
+    /* ── 激励排名（2026-10-26 新增）────────────────────────────────────────
+       BI 新加了三张「周排名」表，每张一周一行、只放当周第一名：
+         门店数据-完成率排名(周)   → 门店 + 业绩完成率
+         咨询数据-完成率排名(周)   → 咨询人员 + 业绩完成率
+         咨询数据-平均单体排名(周) → 咨询人员 + 平均单体
+       这里按「周」把三张表并成一张激励榜，周内顺序固定为
+         健康顾问完成率第一名 / 健康顾问单体第一名 / 机构周业绩第一名。
+       三张表都是可选表（scripts/fetch_data.py 的 OPTIONAL_TABLES）：缺任一张或整张为空
+       都不报错，只是对应那一行不出现；全缺时弹窗显示「暂无数据」。
+       列名一律按关键字找（年周/周/行号、门店/咨询人员、完成率/平均单体），
+       BI 端微调列名不会把这张表弄断。 */
+    const incentive = buildIncentive(rankRaws || {});
+
     /* ── 每日实收（动态活动窗口）：daily.json 时间形如"2026年10月13日"，元 → 万。
        按下标 = 该日期距活动首日的天数入列；窗口外的日期（如 BI 里更早的历史）直接忽略。
        这样 10 月、11 月…只要 BI「天数」列更新，曲线自动跟着走，不用改代码。 */
@@ -440,6 +538,8 @@
       channelCards,
       staff,
       daily: { byId, all, has },
+      /* 激励排名（2026-10-26）：三张周排名表并出来的榜单，供「激励排名」弹窗渲染 */
+      incentive,
       /* 原始表（2026-10-14 新增）：给「更多」弹窗渲染明细表格用，
          每次心跳随模型整体替换，弹窗打开时拿到的永远是最新值。 */
       tables: {
@@ -472,6 +572,20 @@
   }
 
   const TABLES = ["stores", "consults", "doctors", "web", "market", "referral", "market_groups", "daily"];
+  /* 可选表（2026-10-26）：激励排名弹窗用的三张周排名表。
+     ⚠ 千万不能混进上面的 TABLES —— TABLES 里任何一张取不到都会让整页取数失败（白屏），
+     这三张只是弹窗的锦上添花，取不到就当空榜单处理（弹窗显示「暂无数据」）。 */
+  const OPT_TABLES = ["store_rank_week", "consult_rank_week", "consult_ticket_week"];
+
+  /* 可选表的安全取数：404 / 网络错误都返回 null，绝不抛错 */
+  async function fetchOptional(file) {
+    try {
+      return await fetchJSON(file);
+    } catch (e) {
+      console.warn(`[看板] 可选表 ${file}.json 取不到（弹窗会显示暂无数据）`, e.message || e);
+      return null;
+    }
+  }
 
   /* 取 8 张表（2026-10-15）：优先读 CI 合并好的 bundle.json —— 1 个请求而不是 8 个。
      这是给「同一办公室多人同时刷新」降限流风险用的。
@@ -479,12 +593,18 @@
   async function loadAllTables() {
     try {
       const b = await fetchJSON("bundle");
-      if (b && TABLES.every((t) => b[t])) return TABLES.map((t) => b[t]);
+      if (b && TABLES.every((t) => b[t]))
+        return [
+          ...TABLES.map((t) => b[t]),
+          ...OPT_TABLES.map((t) => b[t] || null), // bundle 里没有这三张 → null
+        ];
       console.warn("bundle.json 不完整，回退逐个抓取");
     } catch (e) {
       console.warn("bundle.json 取数失败，回退逐个抓取", e);
     }
-    return Promise.all(TABLES.map((t) => fetchJSON(t)));
+    const required = await Promise.all(TABLES.map((t) => fetchJSON(t)));
+    const optional = await Promise.all(OPT_TABLES.map((t) => fetchOptional(t)));
+    return [...required, ...optional];
   }
 
   async function loadDashboardData() {
@@ -497,6 +617,9 @@
       referralRaw,
       groupsRaw,
       dailyRaw,
+      storeRankRaw,
+      consultRankRaw,
+      ticketRankRaw,
     ] = await loadAllTables();
     const out = buildModel(
       storesRaw,
@@ -505,6 +628,7 @@
       { web: webRaw, market: marketRaw, referral: referralRaw },
       dailyRaw,
       groupsRaw,
+      { store: storeRankRaw, consult: consultRankRaw, ticket: ticketRankRaw },
     );
     out.updatedAt = [
       storesRaw,

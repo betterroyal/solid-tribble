@@ -30,8 +30,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bi_api  # noqa: E402
 
 TABLE_NAMES = ["门店数据", "咨询数据", "医生数据", "网电数据", "市场数据",
-               "市场各小组数据", "老带新数据"]
+               "市场各小组数据", "老带新数据",
+               # 2026-10-26 新增：激励排名弹窗用的三张「周排名」表
+               "门店数据-完成率排名(周)", "咨询数据-完成率排名(周)",
+               "咨询数据-平均单体排名(周)"]
 DAILY_TABLE = "门店每日数据"
+# 可选表：抓不到不算失败（不让整次运行判死）。三张周排名表只服务「激励排名」弹窗，
+# BI 侧改版/换页时最多是弹窗显示「暂无数据」，绝不能因此拖垮主看板的取数。
+OPTIONAL_TABLES = {"门店数据-完成率排名(周)", "咨询数据-完成率排名(周)",
+                   "咨询数据-平均单体排名(周)"}
 FILE_KEYS = {
     "门店数据": "stores",
     "咨询数据": "consults",
@@ -41,6 +48,9 @@ FILE_KEYS = {
     "市场各小组数据": "market_groups",
     "老带新数据": "referral",
     "门店每日数据": "daily",
+    "门店数据-完成率排名(周)": "store_rank_week",
+    "咨询数据-完成率排名(周)": "consult_rank_week",
+    "咨询数据-平均单体排名(周)": "consult_ticket_week",
 }
 OUT_DIR = Path(__file__).resolve().parent.parent / "site" / "data"
 CN_TZ = timezone(timedelta(hours=8))  # CI 服务器是 UTC,固定成北京时间
@@ -55,6 +65,10 @@ HEADER_CHECK = {
     "市场各小组数据": ["所属部门", "平均单体"],
     "老带新数据": ["总目标"],
     "门店每日数据": ["时间", "门店", "实收金额"],
+    # 三张周排名表（2026-10-26）：只要表头还有「年周」+ 关键人/店列就认
+    "门店数据-完成率排名(周)": ["年周", "门店"],
+    "咨询数据-完成率排名(周)": ["年周", "咨询人员"],
+    "咨询数据-平均单体排名(周)": ["年周", "平均单体"],
 }
 
 
@@ -218,7 +232,11 @@ def main():
             except Exception as e:
                 print("[取数] %s 页面失败:%s" % (page_key, str(e)[:120]))
         written = write_tables(tables, want)
-        missing = [n for n in want if n not in written]
+        # 可选表（三张周排名）缺了不算失败，只提示 —— 见 OPTIONAL_TABLES 注释
+        missing = [n for n in want if n not in written and n not in OPTIONAL_TABLES]
+        opt_missing = [n for n in want if n not in written and n in OPTIONAL_TABLES]
+        if opt_missing:
+            print("[提示] 可选表未抓到(不影响主看板):%s" % "、".join(opt_missing))
         if not missing:
             print("[完成] %d 张表,总耗时 %.2f 秒" % (len(written), time.time() - t_all))
             return 0

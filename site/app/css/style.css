@@ -470,6 +470,46 @@
         color: var(--text-dim);
         padding: 12px 0;
       }
+      /* 「激励排名」弹窗表（2026-10-26）：周次列 rowspan 合并，所以不能沿用
+         .more-table 的斑马纹与「首列金色加粗」（合并后每行首格含义不同），
+         改成按行描边 + 只在周次/数值两处用金色。 */
+      .inc-table tbody tr:nth-child(even) td {
+        background: none;
+      }
+      /* 表头跟着单元格走：前 3 列左对齐，只有「详细数据」靠右（.more-table 默认全是右对齐） */
+      .inc-table th {
+        text-align: left;
+      }
+      .inc-table th:last-child {
+        text-align: right;
+      }
+      .inc-table th:first-child,
+      .inc-table td.wk {
+        width: 96px; /* 周次列收窄，把空间让给项目名，避免「第1周」被拉成一格空白 */
+        text-align: center;
+      }
+      .inc-table td {
+        text-align: left;
+      }
+      .inc-table td.wk {
+        color: #f0d48a;
+        font-weight: 600;
+        vertical-align: middle;
+        border-right-color: rgba(212, 175, 55, 0.45);
+      }
+      .inc-table td.item {
+        color: var(--text-main);
+      }
+      .inc-table td.who {
+        color: var(--gold-num);
+        font-weight: 600;
+        text-align: left;
+      }
+      .inc-table td.num {
+        text-align: right;
+        color: var(--gold-num);
+        font-weight: 700;
+      }
       /* 6 卡布局（2026-10-16 需求）：
          ┌ 左侧红框区（不可动）：时间进度 232 + 间距 16 + 今日数据 232 = 480，
            「时间进度 / 今日数据」各自加宽 4px 把原 24px 间距摊平，
@@ -977,6 +1017,25 @@
         color: var(--text-dim);
         letter-spacing: 2px;
         white-space: nowrap;
+      }
+      /* 说明文字里可点的「激励排名」（2026-10-26 需求）：下划线 + 金色，
+         hover 变亮；用 button 实现是为了能键盘 Tab + 回车，外观完全当文字看。 */
+      .hero-note .note-link {
+        font: inherit;
+        letter-spacing: inherit;
+        color: var(--gold-num);
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+      }
+      .hero-note .note-link:hover,
+      .hero-note .note-link:focus-visible {
+        color: #fff3cf;
+        outline: none;
       }
 
       /* 左右门店标签（width / 字号走 --u，随模块等比缩放） */

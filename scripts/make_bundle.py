@@ -31,6 +31,9 @@ OUT = os.path.join(DATA_DIR, "bundle.json")
 
 # 顺序与 data.js 里的 TABLES 保持一致；键名 = 原文件名（不含 .json）
 TABLES = ["stores", "consults", "doctors", "web", "market", "referral", "market_groups", "daily"]
+# 可选表（2026-10-26）：激励排名弹窗用的三张「周排名」表。缺了照样出 bundle，
+# 前端的弹窗显示「暂无数据」—— 绝不能因为这三张表没抓到就让整个数据包停产。
+OPTIONAL = ["store_rank_week", "consult_rank_week", "consult_ticket_week"]
 
 
 def main():
@@ -52,6 +55,17 @@ def main():
         # 缺表就不产出：宁可继续用旧的 bundle，也不要写一个残缺文件把看板搞空白
         print("缺少表 %s，保留旧 bundle.json 不动" % ", ".join(missing), file=sys.stderr)
         return 1
+
+    for t in OPTIONAL:
+        p = os.path.join(DATA_DIR, t + ".json")
+        if not os.path.exists(p):
+            print("可选表 %s.json 缺失，跳过（弹窗会显示暂无数据）" % t, file=sys.stderr)
+            continue
+        try:
+            with open(p, encoding="utf-8") as f:
+                bundle[t] = json.load(f)
+        except Exception as e:
+            print("读取 %s.json 失败: %s" % (t, e), file=sys.stderr)
 
     tmp = OUT + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
