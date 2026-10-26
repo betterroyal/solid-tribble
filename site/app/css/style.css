@@ -179,6 +179,13 @@
         color: #3a2506;
         font-weight: 600;
       }
+      /* 暂时藏起来的排序按钮（2026-10-26 需求：「目标」先不露出来，但能力留着）。
+         只是 display:none，按钮本身、它的 data-by、main.js 里 RANK_METRIC.target
+         整套逻辑都还在 —— 哪天要放出来，把 index.html 里那枚按钮的 seg-hide
+         类删掉即可，不用动 JS/CSS。 */
+      .seg-btn.seg-hide {
+        display: none;
+      }
 
       /* 入场：JS 逐个加 .in */
       .rv {
