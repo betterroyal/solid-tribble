@@ -137,10 +137,12 @@
   /* 三张周排名表 → { weeks:[{week,date,count}], rows:[{week,label,who,value,kind}], empty }
      按周合并；周的排序优先用「年周_时间」，没有日期就按周序号。 */
   function buildIncentive(ranks) {
-    const colOf = (raw, res) => {
+    const colOf = (raw, res, exclude) => {
       const cols = (raw && raw.columns) || [];
       for (const re of res) {
-        const c = cols.find((x) => re.test(String(x)));
+        const c = cols.find(
+          (x) => re.test(String(x)) && !(exclude && exclude.test(String(x))),
+        );
         if (c) return c;
       }
       return null;
@@ -156,7 +158,9 @@
         colOf(raw, [/^(?!.*(年周|时间|日期)).*周/]) || colOf(raw, [/行号/]);
       const dateCol = colOf(raw, [/年周/, /时间/, /日期/]);
       const nameCol = colOf(raw, [item.nameRe]);
-      const valCol = colOf(raw, [item.valRe]);
+      /* ⚠ 排除「业绩完成率_排名」「平均单体_排名」这类名次列（实测 BI 会多给一列排名，
+         值恒为 1.0）—— 不排除的话 /完成率/ 会先命中排名列，整榜数字全变 100%。 */
+      const valCol = colOf(raw, [item.valRe], /排名|名次/);
       if (!nameCol || !valCol) return;
       /* 完成率口径：这几张周排名表 BI 给的都是 0~1 的小数（1.663 = 166.3%）。
          按整列最大值判断 —— 全列都 ≤10 一定是小数口径（百分数口径会出现 100+ 的值），
