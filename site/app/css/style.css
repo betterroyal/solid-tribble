@@ -498,7 +498,9 @@
         border-right-color: rgba(212, 175, 55, 0.45);
       }
       .inc-table td.item {
-        color: var(--text-main);
+        /* 2026-10-27 需求：与左表「第2名」同色 —— 即 var(--text-sub)
+           rgba(243,236,225,0.72)，压在暗红底上呈淡粉白；原先用 --text-main 全不透明，偏白偏亮 */
+        color: var(--text-sub);
       }
       .inc-table td.who {
         color: var(--gold-num);
