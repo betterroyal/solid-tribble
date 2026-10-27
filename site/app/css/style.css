@@ -501,6 +501,10 @@
         /* 2026-10-27 需求：与左表「第2名」同色 —— 即 var(--text-sub)
            rgba(243,236,225,0.72)，压在暗红底上呈淡粉白；原先用 --text-main 全不透明，偏白偏亮 */
         color: var(--text-sub);
+        /* 第1周的周次格 rowspan=3，导致第 2/3 行的「激励项目」意外变成 td:first-child，
+           被 .more-table td:first-child 的 600 加粗命中，于是第 1 行 400、第 2 行 600，
+           同色也看着不一样。这里统一 600，与「激励对象」列一致。 */
+        font-weight: 600;
       }
       .inc-table td.who {
         color: var(--gold-num);
@@ -523,7 +527,9 @@
       }
       .inc-table tbody tr.inc-consult td.item,
       .inc-table tbody tr.inc-ticket td.item {
-        color: var(--text-main);
+        /* 2026-10-27 用户再次调整：前两行的「激励项目」不要米白，直接跟右边
+           「激励对象」同一个金色 var(--gold-num) #f5d67b，让"项目—对象"成对读。 */
+        color: var(--gold-num);
       }
       /* 每周激励榜的列宽（2026-10-27 用户两次要求「列宽缩窄」）：
          第一版 1480px 弹窗 → 右栏 764px，4 列被 auto 布局摊开（96/312/198/157），
