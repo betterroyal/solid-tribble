@@ -1130,8 +1130,9 @@
         letter-spacing: 2px;
         white-space: nowrap;
       }
-      /* 说明文字里可点的「激励排名」（2026-10-26 需求）：下划线 + 金色，
-         hover 变亮；用 button 实现是为了能键盘 Tab + 回车，外观完全当文字看。 */
+      /* 说明文字里可点的「激励排名」（2026-10-26 需求）：金色、hover 变亮；
+         2026-10-27 去掉了下方那条下划线，只留金色文字，其余不变。
+         用 button 实现是为了能键盘 Tab + 回车，外观完全当文字看。 */
       .hero-note .note-link {
         font: inherit;
         letter-spacing: inherit;
@@ -1140,9 +1141,7 @@
         border: none;
         padding: 0;
         cursor: pointer;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        text-decoration-thickness: 1px;
+        text-decoration: none;
       }
       .hero-note .note-link:hover,
       .hero-note .note-link:focus-visible {
