@@ -513,33 +513,65 @@
       /* ── 「激励排名」弹窗改左右两栏（2026-10-27 需求）────────────────────
          左栏 = 每日业绩完成率 TOP2（BI 门店每日数据，今天在最上）
          右栏 = 每周激励榜（原有的三张周排名表）
-         左栏有 20+ 天 × 2 行，两栏各自滚动、表头吸顶（.more-table th 已 position:sticky），
-         所以弹窗本身要加宽到 1480px 才放得下「6 列 + 4 列」。 */
+         弹窗宽度要 1480px 才放得下「6 列 + 4 列」。
+
+         高度规则（用户第二次要求）：弹窗高度跟着「右栏」走 —— 刚好包住
+         每周激励榜那 15 行，不留一大片空白；左栏几十行的溢出部分自己滚动。
+         做法：左栏 position:relative，里面的滚动区 absolute 填满小标题以下的
+         剩余空间，于是左栏不参与 grid 行高计算，行高就只由右栏内容决定。 */
       .modal-box.inc-box {
         width: 1480px;
-        max-height: 920px; /* 按 1920×1080 舞台稿给固定值，比 82vh 更可控 */
+        max-height: 920px;
       }
       .inc-wrap {
+        --inc-hd: 54px; /* 小标题占位（margin 10 + 高 38 + 6），左栏滚动区从这儿开始 */
         display: grid;
         grid-template-columns: 660px minmax(0, 1fr);
         gap: 18px;
-        align-items: start;
+        min-height: 460px; /* 右栏万一没数据，弹窗不至于缩成一条 */
         padding-top: 4px;
       }
       .inc-col {
         min-width: 0;
       }
       .inc-hd {
+        height: 38px;
+        display: flex;
+        align-items: center;
         font-size: var(--t4);
         color: #f0d48a;
         letter-spacing: 2px;
-        margin: 12px 0 8px;
-        padding-bottom: 6px;
+        margin: 10px 0 6px;
         border-bottom: 1px solid rgba(212, 175, 55, 0.3);
       }
-      .inc-scroll {
+      /* 左栏：滚动区绝对定位 → 高度不吃进 grid 行高 */
+      .inc-col-l {
+        position: relative;
+      }
+      .inc-col-l > .inc-scroll {
+        position: absolute;
+        inset: var(--inc-hd) 0 0 0;
+        overflow: auto;
+      }
+      /* 右栏：普通流，决定弹窗高度；周数多到超过 810px 时才自己滚 */
+      .inc-col-r > .inc-scroll {
         max-height: 810px;
         overflow: auto;
+      }
+      /* 细金色滚动条（默认的白色粗条压在暗红底上太扎眼） */
+      .inc-scroll::-webkit-scrollbar {
+        width: 8px;
+      }
+      .inc-scroll::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+      }
+      .inc-scroll::-webkit-scrollbar-thumb {
+        background: rgba(212, 175, 55, 0.45);
+        border-radius: 4px;
+      }
+      .inc-scroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(212, 175, 55, 0.7);
       }
       /* 每日 TOP2 表：日期列 rowspan 合并 → 同样不能沿用斑马纹（合并后行高不齐） */
       .dt-table tbody tr:nth-child(even) td {
