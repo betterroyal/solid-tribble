@@ -434,7 +434,9 @@
                         d.today ? `<span class="dt-tag">今日 · 实时</span>` : ""
                       }</td>`
                     : "";
-                return `<tr>${dayCell}<td class="dt-store">${it.name}</td><td class="dt-rank r${it.rank}">第${it.rank}名</td><td class="num">${fmtCell(it.target)}</td><td class="num">${fmtCell(it.actual)}</td><td class="num dt-pct">${Number(it.pct).toFixed(2)}%</td></tr>`;
+                /* 实收金额（2026-10-27 用户要求）：走 fmtY 固定两位小数 + 千分位，
+                   与 BI 报表里的显示完全一致（4,800 → 4,800.00）；目标仍是整数。 */
+                return `<tr>${dayCell}<td class="dt-store">${it.name}</td><td class="dt-rank r${it.rank}">第${it.rank}名</td><td class="num">${fmtCell(it.target)}</td><td class="num">${fmtY(it.actual)}</td><td class="num dt-pct">${Number(it.pct).toFixed(2)}%</td></tr>`;
               })
               .join(""),
           )
@@ -443,12 +445,12 @@
           <thead><tr><th>时间</th><th>门店</th><th>排名</th><th>业绩目标</th><th>实收金额</th><th>业绩完成率</th></tr></thead>
           <tbody>${body}</tbody></table>`;
       };
-      /* 弹窗正文：左 = 每日 TOP2（新），右 = 每周激励榜（原有）
+      /* 弹窗正文：左 = 每日完成率前两名（新），右 = 每周激励榜（原有）
          ⚠ 左栏必须带 inc-col-l（CSS 里靠它把滚动区绝对定位，右栏定弹窗高度），
          右栏 inc-col-r 是普通流，决定弹窗总高。 */
       const incentiveHTML = () => `<div class="inc-wrap">
           <div class="inc-col inc-col-l">
-            <div class="inc-hd">每日业绩完成率 TOP2</div>
+            <div class="inc-hd">每日业绩完成率</div>
             <div class="inc-scroll">${dailyTop2HTML()}</div>
           </div>
           <div class="inc-col inc-col-r">

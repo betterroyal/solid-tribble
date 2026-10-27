@@ -128,10 +128,13 @@
   /* 激励榜单的三类奖项：key = ranks 里的表键；label = 弹窗里显示的项目名；
      kind 决定值的格式化（pct 百分比 / money 元）。
      顺序即弹窗里的行序（用户给的原型就是这个顺序）。 */
+  /* 三张周排名表各自的「项目名」。
+     2026-10-27 用户要求：表里不再带「第一名」后缀（三行的关键词已经能区分），
+     所以 label 直接就是项目名，去掉尾缀。 */
   const INCENTIVE_ITEMS = [
-    { key: "consult", label: "健康顾问完成率第一名", nameRe: /咨询人员|咨询|姓名/, valRe: /完成率/, kind: "pct" },
-    { key: "ticket", label: "健康顾问单体第一名", nameRe: /咨询人员|咨询|姓名/, valRe: /平均单体/, kind: "money" },
-    { key: "store", label: "机构周业绩第一名", nameRe: /门店/, valRe: /完成率/, kind: "pct" },
+    { key: "consult", label: "健康顾问完成率", nameRe: /咨询人员|咨询|姓名/, valRe: /完成率/, kind: "pct" },
+    { key: "ticket", label: "健康顾问单体", nameRe: /咨询人员|咨询|姓名/, valRe: /平均单体/, kind: "money" },
+    { key: "store", label: "机构周业绩", nameRe: /门店/, valRe: /完成率/, kind: "pct" },
   ];
 
   /* 三张周排名表 → { weeks:[{week,date,count}], rows:[{week,label,who,value,kind}], empty }
@@ -573,7 +576,7 @@
          咨询数据-完成率排名(周)   → 咨询人员 + 业绩完成率
          咨询数据-平均单体排名(周) → 咨询人员 + 平均单体
        这里按「周」把三张表并成一张激励榜，周内顺序固定为
-         健康顾问完成率第一名 / 健康顾问单体第一名 / 机构周业绩第一名。
+         健康顾问完成率 / 健康顾问单体 / 机构周业绩（2026-10-27 起不再带「第一名」后缀）。
        三张表都是可选表（scripts/fetch_data.py 的 OPTIONAL_TABLES）：缺任一张或整张为空
        都不报错，只是对应那一行不出现；全缺时弹窗显示「暂无数据」。
        列名一律按关键字找（年周/周/行号、门店/咨询人员、完成率/平均单体），

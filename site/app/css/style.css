@@ -476,16 +476,16 @@
       .inc-table tbody tr:nth-child(even) td {
         background: none;
       }
-      /* 表头跟着单元格走：前 3 列左对齐，只有「详细数据」靠右（.more-table 默认全是右对齐） */
+      /* 表头统一居中（2026-10-27 用户要求）：以前前 3 列左对齐、末列右对齐，
+         列宽一动就显得歪，直接全部居中，压在各自列的正上方。 */
       .inc-table th {
-        text-align: left;
-      }
-      .inc-table th:last-child {
-        text-align: right;
+        text-align: center;
       }
       .inc-table th:first-child,
       .inc-table td.wk {
-        width: 96px; /* 周次列收窄，把空间让给项目名，避免「第1周」被拉成一格空白 */
+        /* 周次列不用绝对值，改百分比 —— 表格 2026-10-27 起了 table-layout:fixed，
+           全表列宽按第一行（thead）的百分比分配，px 会和别的列打架 */
+        width: 12%;
         text-align: center;
       }
       .inc-table td {
@@ -510,17 +510,36 @@
         color: var(--gold-num);
         font-weight: 700;
       }
+      /* 每周激励榜的列宽（2026-10-27 用户要求「每个列宽都很宽，缩窄一点」）：
+         原来 1480px 弹窗 → 右栏 764px，4 列被 auto 布局摊开（96/312/198/157），
+         项目名一列吃掉 312px，数字离名字老远。改成：
+         ① 弹窗 1480 → 1330（左栏 660 不变，右栏 764 → 614，两栏也就更均衡）；
+         ② table-layout:fixed + 百分比列宽，谁也别想抢别人的空间。 */
+      .inc-table {
+        table-layout: fixed;
+      }
+      .inc-table th:nth-child(1) {
+        width: 12%; /* 周次 */
+      }
+      .inc-table th:nth-child(2) {
+        width: 34%; /* 激励项目 */
+      }
+      .inc-table th:nth-child(3) {
+        width: 30%; /* 激励对象 */
+      }
+      .inc-table th:nth-child(4) {
+        width: 24%; /* 详细数据 */
+      }
       /* ── 「激励排名」弹窗改左右两栏（2026-10-27 需求）────────────────────
-         左栏 = 每日业绩完成率 TOP2（BI 门店每日数据，今天在最上）
+         左栏 = 每日业绩完成率前两名（BI 门店每日数据，今天在最上）
          右栏 = 每周激励榜（原有的三张周排名表）
-         弹窗宽度要 1480px 才放得下「6 列 + 4 列」。
 
          高度规则（用户第二次要求）：弹窗高度跟着「右栏」走 —— 刚好包住
          每周激励榜那 15 行，不留一大片空白；左栏几十行的溢出部分自己滚动。
          做法：左栏 position:relative，里面的滚动区 absolute 填满小标题以下的
          剩余空间，于是左栏不参与 grid 行高计算，行高就只由右栏内容决定。 */
       .modal-box.inc-box {
-        width: 1480px;
+        width: 1330px;
         max-height: 920px;
       }
       .inc-wrap {
@@ -577,13 +596,12 @@
       .dt-table tbody tr:nth-child(even) td {
         background: none;
       }
-      .dt-table th:nth-child(-n + 3),
-      .dt-table td.dt-store,
-      .dt-table td.dt-rank {
-        text-align: left;
-      }
-      .dt-table th:nth-child(n + 4) {
-        text-align: right;
+      /* 表头一律居中（2026-10-27 用户要求）：以前前 3 列左对齐、后 3 列右对齐，
+         和下面的数值列对齐方式不一致，看着参差。单元格仍是「文字靠左、数字靠右」。
+         ⚠ 用 .more-table.dt-table（0,2,1）压住 .more-table th:first-child 的左对齐，
+         单写 .dt-table th 会被它盖掉（优先级更低）。 */
+      .more-table.dt-table th {
+        text-align: center;
       }
       .dt-table th:first-child,
       .dt-table td.dt-day {
@@ -607,6 +625,8 @@
         color: var(--text-dim);
       }
       .dt-table td.dt-store {
+        /* 表头居中不影响单元格：门店名仍靠左（.more-table td 默认右对齐，必须显式写） */
+        text-align: left;
         color: var(--gold-num);
         font-weight: 600;
       }
