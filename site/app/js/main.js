@@ -406,7 +406,9 @@
             const weekCell = first
               ? `<td class="wk" rowspan="${counts[r.week]}">${r.week}</td>`
               : "";
-            return `<tr>${weekCell}<td class="item">${r.label}</td><td class="who">${r.who}</td><td class="num">${incValue(r.value, r.kind)}</td></tr>`;
+            /* 行类名带指标 key（consult / ticket / store），CSS 据此给「机构周业绩」
+               整行压暗、给前两行的「激励项目」留亮色（2026-10-27 需求） */
+            return `<tr class="inc-r inc-${r.key || "x"}">${weekCell}<td class="item">${r.label}</td><td class="who">${r.who}</td><td class="num">${incValue(r.value, r.kind)}</td></tr>`;
           })
           .join("");
         return `<table class="more-table inc-table">
@@ -436,7 +438,8 @@
                     : "";
                 /* 实收金额（2026-10-27 用户要求）：走 fmtY 固定两位小数 + 千分位，
                    与 BI 报表里的显示完全一致（4,800 → 4,800.00）；目标仍是整数。 */
-                return `<tr>${dayCell}<td class="dt-store">${it.name}</td><td class="dt-rank r${it.rank}">第${it.rank}名</td><td class="num">${fmtCell(it.target)}</td><td class="num">${fmtY(it.actual)}</td><td class="num dt-pct">${Number(it.pct).toFixed(2)}%</td></tr>`;
+                /* 行类名 dt-r1 / dt-r2：CSS 据此把「第二名」整行压成 .dt-rank 同色 */
+                return `<tr class="dt-r${it.rank}">${dayCell}<td class="dt-store">${it.name}</td><td class="dt-rank r${it.rank}">第${it.rank}名</td><td class="num">${fmtCell(it.target)}</td><td class="num">${fmtY(it.actual)}</td><td class="num dt-pct">${Number(it.pct).toFixed(2)}%</td></tr>`;
               })
               .join(""),
           )

@@ -188,6 +188,9 @@
             items: [],
           });
         byWeek.get(wKey).items.push({
+          /* key 一并带出（2026-10-27）：弹窗要按「机构周业绩」整行单独上色，
+             用 key 比拿中文 label 比对稳（label 以后改文案也不会失效） */
+          key: item.key,
           label: item.label,
           who,
           value: num(r[valCol]) * pctK,

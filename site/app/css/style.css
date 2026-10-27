@@ -512,6 +512,19 @@
         color: var(--gold-num);
         font-weight: 700;
       }
+      /* 每周激励榜的行级配色（2026-10-27 需求）：
+         ① 每周第 3 行「机构周业绩」整行压成「第二名」那档淡粉白（--text-sub）；
+         ② 前两行（健康顾问完成率 / 健康顾问单体）的「激励项目」恢复改前的
+           var(--text-main)，好让这两项从机构行里跳出来。
+         行类名由 main.js 按指标 key 输出（inc-consult / inc-ticket / inc-store），
+         用 tbody tr.X td 这种 2 类 + 3 标签的写法压过 .inc-table td.who / td.num。 */
+      .inc-table tbody tr.inc-store td {
+        color: var(--text-sub);
+      }
+      .inc-table tbody tr.inc-consult td.item,
+      .inc-table tbody tr.inc-ticket td.item {
+        color: var(--text-main);
+      }
       /* 每周激励榜的列宽（2026-10-27 用户两次要求「列宽缩窄」）：
          第一版 1480px 弹窗 → 右栏 764px，4 列被 auto 布局摊开（96/312/198/157），
          项目名一列吃掉 312px，数字离名字老远。
@@ -630,8 +643,9 @@
         color: var(--text-dim);
       }
       .dt-table td.dt-store {
-        /* 表头居中不影响单元格：门店名仍靠左（.more-table td 默认右对齐，必须显式写） */
-        text-align: left;
+        /* 表头居中不影响单元格：门店名靠左（.more-table td 默认右对齐，必须显式写）
+           2026-10-27 用户要求：门店列也居中，与表头对齐 */
+        text-align: center;
         color: var(--gold-num);
         font-weight: 600;
       }
@@ -646,6 +660,13 @@
       .dt-table td.dt-pct {
         color: var(--gold-num);
         font-weight: 700;
+      }
+      /* 「第二名」整行统一压成 .dt-rank 的淡粉白（2026-10-27 需求）：
+         门店名/目标/实收/完成率原本各有各的颜色，这一行全部让位给同一个色值，
+         用 .more-table.dt-table tbody tr.dt-r2 td（3 类 + 3 标签）压过
+         .dt-table td.dt-store / td.dt-pct 这些单格规则。 */
+      .more-table.dt-table tbody tr.dt-r2 td {
+        color: var(--text-sub);
       }
       /* 6 卡布局（2026-10-16 需求）：
          ┌ 左侧红框区（不可动）：时间进度 232 + 间距 16 + 今日数据 232 = 480，
