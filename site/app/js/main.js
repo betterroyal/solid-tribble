@@ -814,22 +814,38 @@
       const STORE_SORT_ON = { rowsRev: true, rowsRevisit: true };
       /* 每个面板可选指标的取数口径 + 该指标在行内对应哪个数字（hl）：
          amount → 「实收 53.48」/「初诊 282」；target → 「/ 目标 65.00」；
-         pct → 行尾百分比；avg → 行内末尾临时补一段「· 单体 3,080.10」并高亮它。 */
+         pct → 行尾百分比；avg → 行内末尾临时补一段「· 单体 3,080.10」并高亮它。
+         2026-10-27 需求：**条形长度也要跟着当前指标走**（点「业绩」条形就表示业绩）。
+         两种口径，跟右栏排行榜 RANK_METRIC 完全一致，避免「数字看业绩、条形还看完成率」：
+           abs —— 指标本身就是百分比，直接当条长（只有完成率；>100% 封顶）
+           rel —— 对比型指标，取「本列表最大值」当满条（第一名必满格） */
       const STORE_METRIC = {
         rowsRev: {
-          target: { val: (s) => s.targetBase, hl: "target" },
-          amount: { val: (s) => s.actual, hl: "amount" },
-          pct: { val: (s) => s.revPct, hl: "pct" },
-          avg: { val: (s) => s.avgTicket, hl: "avg" },
+          target: { val: (s) => s.targetBase, hl: "target", rel: (s) => s.targetBase },
+          amount: { val: (s) => s.actual, hl: "amount", rel: (s) => s.actual },
+          pct: { val: (s) => s.revPct, hl: "pct", abs: (s) => s.revPct },
+          avg: { val: (s) => s.avgTicket, hl: "avg", rel: (s) => s.avgTicket },
         },
         rowsRevisit: {
-          target: { val: (s) => s.initBase, hl: "target" },
-          amount: { val: (s) => initActualOf(s), hl: "amount" },
-          pct: { val: (s) => s.initPct, hl: "pct" },
+          target: { val: (s) => s.initBase, hl: "target", rel: (s) => s.initBase },
+          amount: {
+            val: (s) => initActualOf(s),
+            hl: "amount",
+            rel: (s) => initActualOf(s),
+          },
+          pct: { val: (s) => s.initPct, hl: "pct", abs: (s) => s.initPct },
         },
       };
       const storeMetric = (id) =>
         (STORE_METRIC[id] || {})[STORE_SORT[id]] || STORE_METRIC[id].pct;
+      /* 条形宽度（%）：list 传当前面板已排好序的门店列表，rel 口径要用它求最大值。
+         完成率模式与改前完全一致（clamp(revPct,0,100)），所以默认视图看不出变化。 */
+      const spBarW = (id, s, list) => {
+        const mt = storeMetric(id);
+        if (mt.abs) return clamp(mt.abs(s), 0, 100).toFixed(1);
+        const max = Math.max(...list.map((x) => mt.rel(x)), 1e-6);
+        return clamp((mt.rel(s) / max) * 100, 0, 100).toFixed(1);
+      };
       /* 该面板当前应显示的门店顺序：按当前指标降序（STORE_SORT_ON 为 false 时保持原序，
          目前两个面板都是 true，留这个开关是为了以后想回到"门店固定顺序"能一键改回） */
       const storeOrder = (id, list) => {
@@ -861,7 +877,8 @@
            2026-10-26：行序/高亮走上面的 STORE_METRIC（点按钮排序用），
            行首加 data-name —— 心跳时据此判断行序有没有变，变了就整块重画。 */
         const id = "rowsRev";
-        $("rowsRev").innerHTML = storeOrder(id, m.stores)
+        const list = storeOrder(id, m.stores);
+        $("rowsRev").innerHTML = list
           .map(
             (s) => `<div class="sp-row" data-name="${s.name}">
               <div class="sp-l1">
@@ -870,7 +887,7 @@
                 <span class="sp-meta">实收 ${spNum(id, "amount", fmtW(s.actual))} / 目标 ${spNum(id, "target", fmtW(s.targetBase))}${spAvg(id, s)}</span>
               </div>
               <div class="sp-bar-wrap">
-                <span class="sp-bar"><i data-w="${clamp(s.revPct, 0, 100).toFixed(1)}"></i></span>
+                <span class="sp-bar"><i data-w="${spBarW(id, s, list)}"></i></span>
               </div>
               ${spPct(id, s.revPct)}
             </div>`,
@@ -902,8 +919,7 @@
           const row = rows[i];
           row.querySelector(".sp-meta").innerHTML =
             `实收 ${spNum(id, "amount", fmtW(s.actual))} / 目标 ${spNum(id, "target", fmtW(s.targetBase))}${spAvg(id, s)}`;
-          row.querySelector(".sp-bar i").style.width =
-            clamp(s.revPct, 0, 100).toFixed(1) + "%";
+          row.querySelector(".sp-bar i").style.width = spBarW(id, s, list) + "%";
           const pctEl = row.querySelector(".sp-pct");
           if (animate)
             tweenNum(
@@ -925,7 +941,8 @@
          排序口径见 storeOrder（点按钮可切到目标/初诊/完成率）。 */
       function renderRevisitRows(m, setW) {
         const id = "rowsRevisit";
-        $("rowsRevisit").innerHTML = storeOrder(id, m.stores)
+        const list = storeOrder(id, m.stores);
+        $("rowsRevisit").innerHTML = list
           .map((s) => {
             const done = fmtI(initActualOf(s)),
               goal = fmtI(s.initBase);
@@ -936,7 +953,7 @@
                 <span class="sp-meta">初诊 ${spNum(id, "amount", done)} / 目标 ${spNum(id, "target", goal)}</span>
               </div>
               <div class="sp-bar-wrap">
-                <span class="sp-bar"><i data-w="${clamp(s.initPct, 0, 100).toFixed(1)}"></i></span>
+                <span class="sp-bar"><i data-w="${spBarW(id, s, list)}"></i></span>
               </div>
               ${spPct(id, s.initPct)}
             </div>`;
