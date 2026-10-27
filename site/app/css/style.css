@@ -510,6 +510,86 @@
         color: var(--gold-num);
         font-weight: 700;
       }
+      /* ── 「激励排名」弹窗改左右两栏（2026-10-27 需求）────────────────────
+         左栏 = 每日业绩完成率 TOP2（BI 门店每日数据，今天在最上）
+         右栏 = 每周激励榜（原有的三张周排名表）
+         左栏有 20+ 天 × 2 行，两栏各自滚动、表头吸顶（.more-table th 已 position:sticky），
+         所以弹窗本身要加宽到 1480px 才放得下「6 列 + 4 列」。 */
+      .modal-box.inc-box {
+        width: 1480px;
+        max-height: 920px; /* 按 1920×1080 舞台稿给固定值，比 82vh 更可控 */
+      }
+      .inc-wrap {
+        display: grid;
+        grid-template-columns: 660px minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+        padding-top: 4px;
+      }
+      .inc-col {
+        min-width: 0;
+      }
+      .inc-hd {
+        font-size: var(--t4);
+        color: #f0d48a;
+        letter-spacing: 2px;
+        margin: 12px 0 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      }
+      .inc-scroll {
+        max-height: 810px;
+        overflow: auto;
+      }
+      /* 每日 TOP2 表：日期列 rowspan 合并 → 同样不能沿用斑马纹（合并后行高不齐） */
+      .dt-table tbody tr:nth-child(even) td {
+        background: none;
+      }
+      .dt-table th:nth-child(-n + 3),
+      .dt-table td.dt-store,
+      .dt-table td.dt-rank {
+        text-align: left;
+      }
+      .dt-table th:nth-child(n + 4) {
+        text-align: right;
+      }
+      .dt-table th:first-child,
+      .dt-table td.dt-day {
+        width: 136px;
+        text-align: center;
+      }
+      .dt-table td.dt-day {
+        color: #f0d48a;
+        font-weight: 600;
+        vertical-align: middle;
+        line-height: 1.5;
+        border-right-color: rgba(212, 175, 55, 0.45);
+      }
+      /* 「今日 · 实时」小标：提醒这一行的实收来自门店表、完成率是前端重算的 */
+      .dt-tag {
+        display: block;
+        margin-top: 2px;
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 0;
+        color: var(--text-dim);
+      }
+      .dt-table td.dt-store {
+        color: var(--gold-num);
+        font-weight: 600;
+      }
+      .dt-table td.dt-rank {
+        text-align: center;
+        color: var(--text-sub);
+      }
+      .dt-table td.dt-rank.r1 {
+        color: #f0d48a;
+        font-weight: 700;
+      }
+      .dt-table td.dt-pct {
+        color: var(--gold-num);
+        font-weight: 700;
+      }
       /* 6 卡布局（2026-10-16 需求）：
          ┌ 左侧红框区（不可动）：时间进度 232 + 间距 16 + 今日数据 232 = 480，
            「时间进度 / 今日数据」各自加宽 4px 把原 24px 间距摊平，

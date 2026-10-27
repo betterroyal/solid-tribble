@@ -220,6 +220,118 @@
     return new Date(now.getTime() + (480 + now.getTimezoneOffset()) * 60000);
   }
 
+  /* ── 每日业绩完成率 TOP2（2026-10-27 需求）──────────────────────────────
+     BI「门店每日数据」新增了「业绩目标 / 业绩完成率」两列，这里按天取出完成率的
+     第一名、第二名，供「激励排名」弹窗左边那张表使用。
+
+     口径（用户明确指定，必须与外面曲线图同源，否则表里的数会和曲线对不上）：
+       · 历史日 → 直接用「门店每日数据」的原生「业绩目标 / 实收金额 / 业绩完成率」；
+       · 今日   → 每日表每天凌晨才抓一次、今天的格子不刷新，所以今日改用「门店数据」
+                  表的实时「今日业绩」当实收（与曲线末尾那个点完全同源），
+                  日目标取该店在每日表里最近一天的目标（BI 就是「总目标 ÷ 活动天数」，
+                  实测逐店一致；取不到才退回 总目标 ÷ D），
+                  完成率 = 今日实收 ÷ 日目标 × 100，前端重算。
+     目标为 0 的店（BI 里的「医院」）算不出完成率，不参与排名。
+     输出按日期降序（今天在最上），每天固定取前二名。 */
+  function buildDailyTop2(dailyRaw, stores, D) {
+    const rows = (dailyRaw && dailyRaw.rows) || [];
+    const cols = (dailyRaw && dailyRaw.columns) || [];
+    const revAlias = {}; // BI 名 → 页面名（医院 → 三级医院）
+    Object.keys(CONFIG.aliases).forEach((k) => (revAlias[CONFIG.aliases[k]] = k));
+    /* 列名按关键字找：BI 端改列名 / 加「_总和」后缀都不会把这张表弄断 */
+    const colOf = (res, exclude) => {
+      for (const re of res) {
+        const c = cols.find((x) => re.test(String(x)) && !(exclude && exclude.test(String(x))));
+        if (c) return c;
+      }
+      return null;
+    };
+    const cTime = colOf([/时间/, /日期/]);
+    const cStore = colOf([/门店/]);
+    const cTarget = colOf([/业绩目标/]);
+    const cActual = colOf([/实收金额/, /实收/]);
+    /* ⚠ 排除「业绩完成率_排名」这类名次列（BI 有先例：周排名表就多给了一列恒为 1.0 的名次） */
+    const cRate = colOf([/业绩完成率/, /完成率/], /排名|名次/);
+    /* 完成率口径：BI 每日表给的是百分数（198.65）。若哪天改成 0~1 小数，按整列最大值
+       ≤10 判定后 ×100 —— 与 buildIncentive 同一套判别，不能逐值判断（1.663 这种会被误算）。 */
+    const rateK = cRate ? (Math.max(...rows.map((r) => num(r[cRate])), 0) <= 10 ? 100 : 1) : 1;
+
+    const dayOf = (s) => {
+      const m = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(String(s == null ? "" : s));
+      if (!m) return null;
+      const y = +m[1],
+        mo = +m[2],
+        d = +m[3];
+      return { y, m: mo, d, key: `${y}-${mo}-${d}`, num: y * 10000 + mo * 100 + d };
+    };
+    const days = new Map(); // key → { y,m,d,num,today,items[] }
+    const put = (day, item) => {
+      let box = days.get(day.key);
+      if (!box) days.set(day.key, (box = { y: day.y, m: day.m, d: day.d, num: day.num, today: false, items: [] }));
+      box.items.push(item);
+      if (item.today) box.today = true;
+      return box;
+    };
+
+    /* ① 历史日：门店每日数据的原生值 */
+    const lastTarget = {}; // BI 门店名 → 最近一天的日目标（给今日行用）
+    rows.forEach((r) => {
+      const biName = cStore ? String(r[cStore] == null ? "" : r[cStore]).trim() : "";
+      const day = dayOf(cTime ? r[cTime] : r["时间"]);
+      if (!biName || !day) return;
+      const target = num(cTarget ? r[cTarget] : r["业绩目标"]);
+      const actual = num(cActual ? r[cActual] : r["实收金额"]);
+      /* 记下该店日期最新那天的日目标 —— 每日表的日目标是稳定的，直接拿来当今日目标 */
+      const prev = lastTarget[biName];
+      if (target > 0 && (!prev || day.num >= prev.num)) lastTarget[biName] = { num: day.num, target };
+      if (!(target > 0)) return; // 目标 0 → 算不出完成率，不参与排名
+      let pct = cRate ? num(r[cRate]) * rateK : 0;
+      if (!pct) pct = (actual / target) * 100; // BI 完成率为空时兜底自算
+      put(day, { name: revAlias[biName] || biName, target, actual, pct, today: false });
+    });
+
+    /* ② 今日：门店表的实时「今日业绩」+ 重算完成率（与曲线末尾那个点同源） */
+    const now = cnNow();
+    const today = {
+      y: now.getFullYear(),
+      m: now.getMonth() + 1,
+      d: now.getDate(),
+    };
+    today.key = `${today.y}-${today.m}-${today.d}`;
+    today.num = today.y * 10000 + today.m * 100 + today.d;
+    /* 今日整行以门店表为准：万一每日表里已经有今天（凌晨那次抓到了半天数据），
+       直接丢掉，否则同一家店会出现两行、TOP2 被拆散。 */
+    days.delete(today.key);
+    (stores || []).forEach((s) => {
+      const lt = lastTarget[s.biName];
+      const target = lt && lt.target > 0 ? lt.target : s.targetBase > 0 ? (s.targetBase * 1e4) / D : 0;
+      if (!(target > 0)) return; // 目标 0（医院）→ 不参与排名
+      const actual = s.todayRev == null ? 0 : s.todayRev * 1e4; // 门店表今日业绩（万 → 元）
+      put(today, { name: s.name, target, actual, pct: (actual / target) * 100, today: true });
+    });
+
+    /* 日期降序：今天在最上；同一天内完成率降序取前二。
+       ⚠ 跳过「整日实收全为 0/空」的日期：BI 每日表里最新一天常常是空壳（当天还没结算，
+       实测 10-26 全店实收都是空字符串），照画会显示成 0.00% 的两行，看着像业绩掉零。
+       今日行例外 —— 它是门店表实时值，凌晨确实是 0 也要如实显示。 */
+    const out = [];
+    [...days.values()]
+      .sort((a, b) => b.num - a.num)
+      .forEach((d) => {
+        if (!d.today && !d.items.some((it) => it.actual > 0)) return;
+        out.push({
+          date: `${d.y}年${d.m}月${d.d}日`,
+          today: d.today,
+          items: d.items
+            .slice()
+            .sort((a, b) => b.pct - a.pct || b.actual - a.actual) // 完成率降序，并列看实收
+            .slice(0, 2)
+            .map((it, i) => ({ ...it, rank: i + 1 })),
+        });
+      });
+    return { rows: out, empty: !out.length, hasToday: !!(out[0] && out[0].today) };
+  }
+
   function buildModel(storesRaw, consultsRaw, doctorsRaw, chanRaws, dailyRaw, groupsRaw, rankRaws) {
     /* ── 活动进程：BI"天数/时间进度"列 = 第 N 天 / 共 31 天 ── */
     const D = 31;
@@ -468,6 +580,10 @@
        BI 端微调列名不会把这张表弄断。 */
     const incentive = buildIncentive(rankRaws || {});
 
+    /* 每日业绩完成率 TOP2（2026-10-27 需求）：每日表取历史、门店表补今日，
+       结果挂在「激励排名」弹窗左边的表格上。详见 buildDailyTop2 的注释。 */
+    const dailyTop2 = buildDailyTop2(dailyRaw, stores, D);
+
     /* ── 每日实收（动态活动窗口）：daily.json 时间形如"2026年10月13日"，元 → 万。
        按下标 = 该日期距活动首日的天数入列；窗口外的日期（如 BI 里更早的历史）直接忽略。
        这样 10 月、11 月…只要 BI「天数」列更新，曲线自动跟着走，不用改代码。 */
@@ -544,6 +660,8 @@
       daily: { byId, all, has },
       /* 激励排名（2026-10-26）：三张周排名表并出来的榜单，供「激励排名」弹窗渲染 */
       incentive,
+      /* 每日业绩完成率 TOP2（2026-10-27）：弹窗左边那张「时间/门店/排名/目标/实收/完成率」表 */
+      dailyTop2,
       /* 原始表（2026-10-14 新增）：给「更多」弹窗渲染明细表格用，
          每次心跳随模型整体替换，弹窗打开时拿到的永远是最新值。 */
       tables: {

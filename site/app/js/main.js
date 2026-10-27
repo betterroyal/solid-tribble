@@ -341,9 +341,13 @@
       };
       const moreMask = $("moreMask");
       /* html 优先：给了就直接当弹窗正文（「激励排名」这类自绘表格用），
-         否则按 secs 拼成「小标题 + 原始表」的多段结构（网电/市场明细用）。 */
-      const openMore = (title, secs, html) => {
+         否则按 secs 拼成「小标题 + 原始表」的多段结构（网电/市场明细用）。
+         boxClass（2026-10-27）：「激励排名」弹窗要左右两栏，得比默认 960px 更宽，
+         这里给 .modal-box 挂一个类；其它弹窗不传 → 自动摘掉，互不影响。 */
+      const openMore = (title, secs, html, boxClass) => {
         $("moreTitle").textContent = title;
+        const box = document.querySelector("#moreMask .modal-box");
+        if (box) box.classList.toggle("inc-box", boxClass === "inc-box");
         $("moreBody").innerHTML =
           html != null
             ? html
@@ -386,7 +390,8 @@
          money 是元，走全局的两位小数格式。 */
       const incValue = (v, kind) =>
         kind === "money" ? fmtY(v) : `${Number(v).toFixed(2)}%`;
-      const incentiveHTML = () => {
+      /* 右栏：每周激励榜（BI 三张周排名表并出来的，见 data.js 的 buildIncentive） */
+      const incentiveWeeklyHTML = () => {
         const inc = (MODEL && MODEL.incentive) || {};
         const rows = inc.rows || [];
         if (!rows.length)
@@ -408,8 +413,52 @@
           <thead><tr><th>周次</th><th>激励项目</th><th>激励对象</th><th>详细数据</th></tr></thead>
           <tbody>${body}</tbody></table>`;
       };
+      /* 左栏：每日业绩完成率 TOP2（2026-10-27 需求）
+         BI「门店每日数据」新增「业绩目标 / 业绩完成率」两列后，把每天的完成率
+         第一名、第二名做成表，按日期从今天往前排（降序）。历史日用每日表的原生值；
+         今日行改用门店表的实时「今日业绩」并重算完成率 —— 口径见 data.js 的
+         buildDailyTop2，与外面曲线图完全同源（总额、目标、完成率都对得上） */
+      const dailyTop2HTML = () => {
+        const dt = (MODEL && MODEL.dailyTop2) || {};
+        const days = dt.rows || [];
+        if (!days.length)
+          return `<p class="more-empty">暂无数据 —— BI「门店每日数据」还没取到「业绩目标 / 业绩完成率」两列，等下一次数据刷新（每天 02:00 抓一次）后再看。</p>`;
+        const body = days
+          .map((d) =>
+            d.items
+              .map((it, i) => {
+                /* 日期列 rowspan 合并（同一天的第 1、2 名共用一格），与原型一致 */
+                const dayCell =
+                  i === 0
+                    ? `<td class="dt-day" rowspan="${d.items.length}">${d.date}${
+                        d.today ? `<span class="dt-tag">今日 · 实时</span>` : ""
+                      }</td>`
+                    : "";
+                return `<tr>${dayCell}<td class="dt-store">${it.name}</td><td class="dt-rank r${it.rank}">第${it.rank}名</td><td class="num">${fmtCell(it.target)}</td><td class="num">${fmtCell(it.actual)}</td><td class="num dt-pct">${Number(it.pct).toFixed(2)}%</td></tr>`;
+              })
+              .join(""),
+          )
+          .join("");
+        return `<table class="more-table dt-table">
+          <thead><tr><th>时间</th><th>门店</th><th>排名</th><th>业绩目标</th><th>实收金额</th><th>业绩完成率</th></tr></thead>
+          <tbody>${body}</tbody></table>`;
+      };
+      /* 弹窗正文：左 = 每日 TOP2（新），右 = 每周激励榜（原有） */
+      const incentiveHTML = () => `<div class="inc-wrap">
+          <div class="inc-col">
+            <div class="inc-hd">每日业绩完成率 TOP2</div>
+            <div class="inc-scroll">${dailyTop2HTML()}</div>
+          </div>
+          <div class="inc-col">
+            <div class="inc-hd">每周激励排名</div>
+            <div class="inc-scroll">${incentiveWeeklyHTML()}</div>
+          </div>
+        </div>`;
       const incBtn = $("btnIncentive");
-      if (incBtn) incBtn.addEventListener("click", () => openMore("激励排名（周）", null, incentiveHTML()));
+      if (incBtn)
+        incBtn.addEventListener("click", () =>
+          openMore("激励排名", null, incentiveHTML(), "inc-box"),
+        );
       function updateChips(m) {
         (m.channelCards || []).forEach((card, ci) => {
           card.items.forEach((c, i) => {
