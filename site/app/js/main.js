@@ -293,6 +293,23 @@
           ? String(v)
           : n.toLocaleString("zh-CN", { maximumFractionDigits: 2 });
       };
+      /* 金额口径列（2026-10-28 用户要求）：弹窗里所有业绩 / 单体都要两位小数。
+         原先走 fmtCell 的 maximumFractionDigits: 2 —— 那是「最多两位」，
+         36,285.9 就只显示一位、15,000 连小数点都没有，同一列上下不齐。
+         改成 minimumFractionDigits: 2，固定两位：36,285.90 / 15,000.00。
+         命中列：初诊业绩 / 复诊业绩 / 再消费业绩(一年内) / 总业绩 / 今日业绩 / 平均单体。
+         人数、目标、完成率（另走 fmtRate）不受影响，仍是整数口径。 */
+      const isMoneyCol = (c) => /业绩|单体/.test(c);
+      const fmtMoneyFixed = (v) => {
+        if (v === "" || v == null) return "—";
+        const n = +v;
+        return isNaN(n)
+          ? String(v)
+          : n.toLocaleString("zh-CN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+      };
       /* ── 弹窗表格的显示加工（2026-10-15 用户要求）──
          ① 两字门店名（医院 / 合计）中间补一个全角空格「　」，与「神华店」等
             三字名等宽 —— 首字贴左、末字与三字名的末字对齐；
@@ -331,7 +348,8 @@
                   const nm = v0 == null || v0 === "" ? "—" : String(v0).trim();
                   return `<td>${storeNameFix(nm)}</td>`;
                 }
-                return `<td class="num">${isRateCol(c) ? fmtRate(r[c]) : fmtCell(r[c])}</td>`;
+                const cell = isMoneyCol(c) ? fmtMoneyFixed(r[c]) : fmtCell(r[c]);
+                return `<td class="num">${isRateCol(c) ? fmtRate(r[c]) : cell}</td>`;
               })
               .join("");
             return `<tr>${tds}</tr>`;
