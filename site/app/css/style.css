@@ -1721,3 +1721,18 @@
       }
 
       /* ══════════ 更新时间（已挪到右下角，见 .foot-updated 的统一定义） ══════════ */
+
+
+      /* ══════════ ⑬ 全局等宽数字（2026-10-28 需求） ══════════ */
+      /* 看板里十几处用 `font:` 简写声明数字字体（.sp-pct / .td-num / .num / .kd-n / .t 等），
+         而 font 简写会把 font-variant-numeric 一起重置成 normal —— 于是 body 上那行
+         tabular-nums 在这些元素里全部失效。Bahnschrift 默认是比例数字：「1」只有 4.66px，
+         「8」有 7.88px（14px 字号下实测），所以同为四位数，整体宽度和右边缘都不齐。
+         这里用 #stage * 统一兜底：id 选择器的特异性高于所有 .class 规则，也不受声明顺序影响；
+         字号 / 字重 / 字体族仍由各处原规则决定，只把数字字形换成等宽（tnum）+ 等高（lnum），
+         同字号下每个数字占同样宽度。以后新增数字样式不用再单独写 font-variant-numeric。 */
+      #stage,
+      #stage * {
+        font-variant-numeric: tabular-nums lining-nums;
+        font-feature-settings: "tnum" 1, "lnum" 1;
+      }
