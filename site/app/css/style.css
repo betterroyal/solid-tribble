@@ -1736,3 +1736,19 @@
         font-variant-numeric: tabular-nums lining-nums;
         font-feature-settings: "tnum" 1, "lnum" 1;
       }
+
+      /* ── 2026-10-28 追加（用户要求）：KPI 指标卡的大数字恢复「比例数字」 ──
+         上面那条 #stage * 全局等宽会把 38~44px 的大数字一起拉宽，字号一大就显出
+         「松」和字距变宽，和改前的观感差别很明显。这里只回退这几个大数字 ——
+         它们原本就是用 font 简写声明的元素（简写会把 tabular-nums 重置掉），
+         所以改前本来就是比例数字：累计初诊/平均单体的 .num、第 N 天的 .kpi-days、
+         今日初诊/今日业绩的 .td-num、两枚圆环里的百分比 .ring-txt。
+         卡内小字（今日单体、基础 N 人、chip 里的人数与完成率）改前是等宽的，
+         保持不动；面板、排行、弹窗表格等其余位置仍然全部等宽。 */
+      #stage .kpis .kpi-val .num,
+      #stage .kpis .kpi-val .kpi-days,
+      #stage .kpis .td-num,
+      #stage .kpis .kpi-ring .ring-txt {
+        font-variant-numeric: normal;
+        font-feature-settings: normal;
+      }
