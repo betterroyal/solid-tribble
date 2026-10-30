@@ -138,7 +138,10 @@
       const dayLabel = (i) => `${mdAt(i).m}/${mdAt(i).d}`;
       const dayFull = (i) => `${mdAt(i).m}月${mdAt(i).d}日`;
       const campMonth = `${CAMPAIGN.year}年${CAMPAIGN.month}月`;
-      $("subTitle").textContent = `13周年庆数据看板 · ${campMonth}`;
+      /* 头部副标题 #subTitle 已于 2026-10-30 按需求整块删除，
+         这里改成判空安全的 setTxt —— 直接 $("subTitle").textContent 会在元素缺失时抛错，
+         把整个 module 渲染打断成白屏（副标题之外还有 heroTitle 踩过同样的坑）。 */
+      setTxt("subTitle", `13周年庆数据看板 · ${campMonth}`);
       /* heroTitle 元素已于 2026-10-15 按需求删除（标题改为只留顶部副标题），
          这里必须走判空安全的 setTxt —— 直接 $("heroTitle").textContent 会在
          元素缺失时抛错，把整个 module 渲染打断成白屏（历史上踩过一次）。 */
