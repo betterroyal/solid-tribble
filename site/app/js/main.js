@@ -243,7 +243,7 @@
       /* 累计初诊卡：2026-10-16 起小字行只留「基础 X 人」，
          「客单 xxx 元」搬去独立的「平均单体」卡（见下面的 vAvgTicket）。
          2026-10-30 需求：文案「基础」改为「目标」（与卡内圆环的口径叫法统一）。 */
-      setTxt("subInit", `目标：${fmtI(totalInitBase)} 人`);
+      setTxt("subInit", `初诊目标：${fmtI(totalInitBase)} 人`);
       /* 平均单体（2026-10-16 新增卡）= 六个店业绩之和 ÷ 六个店初诊之和 = KPI.avgTicket（元），
          与「累计初诊」完全同源（data.js 汇总）。
          小字行 2026-10-19 改为「今日单体」= 今日业绩 ÷ 今日初诊（同样按元算），
@@ -1592,7 +1592,7 @@
         setN("vTodayRev", m.kpi.todayRev, fmt2);
         setN("vAvgTicket", m.kpi.avgTicket, fmtY); // 平均单体（2026-10-16 新增卡）
         setTxt("subAvgTicket", todayTicketHTML(m.kpi)); // 今日单体（2026-10-19）
-        $("subInit").textContent = `目标：${fmtI(m.totalInitBase)} 人`;
+        $("subInit").textContent = `初诊目标：${fmtI(m.totalInitBase)} 人`;
         const to = {
           time: m.kpi.timePct,
           init: m.kpi.initPct,
