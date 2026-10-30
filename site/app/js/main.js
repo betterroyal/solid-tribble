@@ -851,23 +851,52 @@
            rel —— 对比型指标，取「本列表最大值」当满条（第一名必满格） */
       const STORE_METRIC = {
         rowsRev: {
-          target: { val: (s) => s.targetBase, hl: "target", rel: (s) => s.targetBase },
-          amount: { val: (s) => s.actual, hl: "amount", rel: (s) => s.actual },
-          pct: { val: (s) => s.revPct, hl: "pct", abs: (s) => s.revPct },
-          avg: { val: (s) => s.avgTicket, hl: "avg", rel: (s) => s.avgTicket },
+          target: {
+            val: (s) => s.targetBase,
+            hl: "target",
+            rel: (s) => s.targetBase,
+            unit: "万元",
+          },
+          amount: {
+            val: (s) => s.actual,
+            hl: "amount",
+            rel: (s) => s.actual,
+            unit: "万元",
+          },
+          pct: { val: (s) => s.revPct, hl: "pct", abs: (s) => s.revPct, unit: "%" },
+          avg: {
+            val: (s) => s.avgTicket,
+            hl: "avg",
+            rel: (s) => s.avgTicket,
+            unit: "元",
+          },
         },
         rowsRevisit: {
-          target: { val: (s) => s.initBase, hl: "target", rel: (s) => s.initBase },
+          target: {
+            val: (s) => s.initBase,
+            hl: "target",
+            rel: (s) => s.initBase,
+            unit: "人",
+          },
           amount: {
             val: (s) => initActualOf(s),
             hl: "amount",
             rel: (s) => initActualOf(s),
+            unit: "人",
           },
-          pct: { val: (s) => s.initPct, hl: "pct", abs: (s) => s.initPct },
+          pct: { val: (s) => s.initPct, hl: "pct", abs: (s) => s.initPct, unit: "%" },
         },
       };
       const storeMetric = (id) =>
         (STORE_METRIC[id] || {})[STORE_SORT[id]] || STORE_METRIC[id].pct;
+      /* 面板右上角「单位」标签跟着当前指标走（2026-10-30 需求，做法对齐右栏 rankTag）：
+         完成率、初诊人数、平均单体的口径各不相同 —— 完成率没有单位、平均单体是「元」
+         而不是「万元」，所以不能再把「单位：万元」/「单位：人」写死在 HTML 里。 */
+      const STORE_TAG = { rowsRev: "tagRev", rowsRevisit: "tagRevisit" };
+      const storeTag = (id) => {
+        const el = $(STORE_TAG[id]);
+        if (el) el.textContent = "单位：" + storeMetric(id).unit;
+      };
       /* 条形宽度（%）：list 传当前面板已排好序的门店列表，rel 口径要用它求最大值。
          完成率模式与改前完全一致（clamp(revPct,0,100)），所以默认视图看不出变化。 */
       const spBarW = (id, s, list) => {
@@ -924,6 +953,7 @@
           )
           .join("");
         // setW=true：点排序按钮 / 心跳重画后直接落位（首次进入交给 entrance 统一铺开）
+        storeTag(id); // 右上角单位跟随当前指标
         if (setW)
           $("rowsRev")
             .querySelectorAll("i[data-w]")
@@ -989,6 +1019,7 @@
             </div>`;
           })
           .join("");
+        storeTag(id); // 右上角单位跟随当前指标
         if (setW)
           $("rowsRevisit")
             .querySelectorAll("i[data-w]")
