@@ -228,14 +228,14 @@
       }
       /* 2026-10-30：徽标由原来的圆形 SVG（112x80）换成 13周年庆 标志图
          （设计稿 13周年庆logo-02：原图 962x349、透明底，已裁掉留白并缩到 416x148，比例 2.811）。
-         尺寸/位置迭代：74px(top 7) → 66px(top 14) → 现按需求定 高度 55px、贴住下方金色分隔线。
-         头部高 88px，分隔线 .h-sep 就在 top:88px（= header 下沿），所以这里用 bottom: 0 而不是算 top，
-         标志底边正好压在线上，以后改 header 高度也不用重算。
-         宽度不写死，由 height:100% + width:auto 按图片比例得出（55 × 2.811 ≈ 155px）。 */
+         尺寸/位置迭代：74px(top 7) → 66px(top 14) → 55px(贴分隔线) → 现按需求「与右侧日期底部对齐」。
+         右侧 .clock 用 justify-content:flex-end + padding-bottom:8px，日期行盒子底边在 88-8=80；
+         日期 14px 文字在 19.6px 行高里居中，墨迹底边约在 76。标志按 10px 底部内缩后墨迹底边也在 76，
+         两侧视觉底边齐平（硬编码 10px 而不是 8px，是因为标志 PNG 底部还差 2px 透明边）。 */
       .logo {
         position: absolute;
         left: var(--sp-4);
-        bottom: 0;
+        bottom: 10px;
         height: 55px;
       }
       .logo img {
