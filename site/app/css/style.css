@@ -1204,12 +1204,19 @@
          2026-10-30 需求：又加回下划线，并把字号放大 2 号（--t5 14px → 16px），
          让它在整行灰色说明文字里更突出。font-size 必须写在 font: inherit 之后，
          否则会被 font 简写重置回父级的 14px。
+         2026-10-30 追加需求：再大 2 号（16px → 18px），紧挨着它的那个分隔点「·」
+         也用同样的字号和金色（.note-sep）—— 该点单独包一层 span，
+         不放进 button，避免下划线连那个点也画上、也不让它变成可点区域。
          用 button 实现是为了能键盘 Tab + 回车，外观完全当文字看。 */
+      .hero-note .note-link,
+      .hero-note .note-sep {
+        font-size: 18px;
+        color: var(--gold-num);
+      }
       .hero-note .note-link {
         font: inherit;
-        font-size: 16px;
+        font-size: 18px;
         letter-spacing: inherit;
-        color: var(--gold-num);
         background: none;
         border: none;
         padding: 0;
