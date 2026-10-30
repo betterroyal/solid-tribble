@@ -80,8 +80,13 @@
       }
       function arcPath(cx, cy, r, a0, a1) {
         const [x0, y0] = polar(cx, cy, r, a0);
-        const [x1, y1] = polar(cx, cy, r, a1);
-        const large = norm(a1 - a0) > 180 ? 1 : 0;
+        /* 2026-10-30 修 bug：原来判据是 norm(a1-a0) > 180，而 norm 对 360 取模，
+           角差一超过 360° 就被回绕成余数，整条弧塌掉（初诊完成率 136.17% 时
+           环图变空就是这个原因）。这里改用原始角差判断，并把整圈封顶在 359.99°
+           —— SVG 单条 A 指令画不出 360°，起终点重合会直接什么都不画。 */
+        const span = Math.min(Math.max(a1 - a0, 0), 359.99);
+        const [x1, y1] = polar(cx, cy, r, a0 + span);
+        const large = span > 180 ? 1 : 0;
         return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
       }
       /* 方向感知弧线（水球组件原版）：dir=-1 时必须走逆时针短弧，
@@ -206,15 +211,19 @@
           class: "ring-txt",
         });
         return (p) => {
+          /* 2026-10-30 修 bug（初诊完成率 136% 时环图变空）：
+             几何角度必须按 100% 封顶。轨道只有 270°，270°×133.33% = 360° 是临界点，
+             超过后角差越过整圈、弧线回绕塌成一小段；文字仍显示真实值（如 136.17%）。 */
+          const pf = Math.min(Math.max(p, 0), 100);
           if (p < 0.5) {
             prog.setAttribute("d", "");
             dot.setAttribute("r", 0);
           } else {
             prog.setAttribute(
               "d",
-              arcPath(CX, CY, R, 135, 135 + (270 * p) / 100),
+              arcPath(CX, CY, R, 135, 135 + (270 * pf) / 100),
             );
-            const [x, y] = polar(CX, CY, R, 135 + (270 * p) / 100);
+            const [x, y] = polar(CX, CY, R, 135 + (270 * pf) / 100);
             dot.setAttribute("cx", x.toFixed(2));
             dot.setAttribute("cy", y.toFixed(2));
             dot.setAttribute("r", 3);
