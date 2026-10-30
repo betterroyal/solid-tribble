@@ -226,16 +226,19 @@
         width: 100%;
         height: 88px;
       }
+      /* 2026-10-30：徽标由原来的圆形 SVG（112x80）换成 13周年庆 标志图
+         （原图 1000x492、透明底，已裁掉留白并缩到 416x149，比例 2.792）。
+         头部只有 88px 高，所以高度定死 74px、宽度按比例自适应 ≈ 207px：
+         左起 32px 结束在 ~239px，离居中的大标题（约 x=696 起）仍有很大余量。 */
       .logo {
         position: absolute;
         left: var(--sp-4);
-        top: 4px;
-        width: 112px;
-        height: 80px;
+        top: 7px;
+        height: 74px;
       }
-      .logo svg {
-        width: 100%;
+      .logo img {
         height: 100%;
+        width: auto;
         display: block;
       }
       .title-wrap {

@@ -31,89 +31,20 @@
     底部折线，页面不重载。历史日序列固定，增长落在「今天」的
     数据点上；左下角有心跳指示器（倒计时 + 刷新闪烁）。
   ============================================================-->
-        <link rel="stylesheet" href="app/css/style.css?v=20261030-3" />
+        <link rel="stylesheet" href="app/css/style.css?v=20261030-4" />
   </head>
   <body data-page-node-id="v0FKEsf7Q6nRDLdoApuXJm">
     <div id="stage" data-page-node-id="kpHgrNEEkZe6PAno3AZiqG">
       <!-- ═══════════ Header ═══════════ -->
       <header id="hd" class="rv" data-page-node-id="wEYzkn5nYDAj5ljEAe1Y7S">
+        <!-- 2026-10-30 需求：原来的圆形「13」徽标（纯 SVG）换成 13周年庆 金色标志图。
+             图片已裁掉透明留白，416x149（比例 2.792），透明底，直接叠在深红头部上。 -->
         <div class="logo" data-page-node-id="156GlCvEMHMHPoqrzs1CSF">
-          <svg viewBox="0 0 180 150" data-page-node-id="gASNDZ9bTVkrAyyckmfHOM">
-            <defs data-page-node-id="hqDiLdGtXwyyaEme4GPJWh">
-              <linearGradient id="lgRing" x1="0" y1="0" x2="0" y2="1" data-page-node-id="lqxeYtdk4iewFhR3yDb2SH">
-                <stop offset="0" stop-color="#fbe7a2" data-page-node-id="FFY9TI5BgzKePglZpI7jYK" />
-                <stop offset="0.5" stop-color="#d4af37" data-page-node-id="RoODJLpOfjntsP8UMK7K4A" />
-                <stop offset="1" stop-color="#9a7a24" data-page-node-id="HEvY9dDS5gaLxZupJrBT9t" />
-              </linearGradient>
-              <linearGradient id="lgNum" x1="0" y1="0" x2="0" y2="1" data-page-node-id="Ao8qt6Al73WwDt1gpRjUwL">
-                <stop offset="0" stop-color="#fdf3cd" data-page-node-id="Ha32vFqB7SGn9soHdYtvfg" />
-                <stop offset="0.45" stop-color="#f0d48a" data-page-node-id="dt03Z1TfhhpD5ZBrbN7TFr" />
-                <stop offset="1" stop-color="#a87f1f" data-page-node-id="MylkIHC2j7ACWehBBXiNBk" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M0 -28 C-16 -28 -24 -16 -21 -2 C-19 8 -15 26 -10 26 C-5 26 -7 12 0 12 C7 12 5 26 10 26 C15 26 19 8 21 -2 C24 -16 16 -28 0 -28 Z"
-              transform="translate(90,72) scale(1.5)"
-              fill="#e8c25f"
-              opacity="0.2" data-page-node-id="RsiaJ8O6N65sGDhtilJ795"
-            />
-            <circle
-              cx="90"
-              cy="72"
-              r="64"
-              fill="none"
-              stroke="url(#lgRing)"
-              stroke-width="3.5" data-page-node-id="2CCHN2UXEv8PuBEjy0APqm"
-            />
-            <circle
-              cx="90"
-              cy="72"
-              r="57"
-              fill="none"
-              stroke="rgba(212,175,55,0.35)"
-              stroke-width="1" data-page-node-id="bCd5TjKRQrcUs7yGlWtTZC"
-            />
-            <text
-              x="90"
-              y="97"
-              text-anchor="middle"
-              font-size="64"
-              font-weight="900"
-              font-family="Bahnschrift, Microsoft YaHei"
-              fill="#4a3608"
-              transform="translate(0,2.5)" data-page-node-id="R2Y0nsFZqWWWNmogxF9ROb"
-            >
-              13
-            </text>
-            <text
-              x="90"
-              y="97"
-              text-anchor="middle"
-              font-size="64"
-              font-weight="900"
-              font-family="Bahnschrift, Microsoft YaHei"
-              fill="url(#lgNum)"
-              stroke="#fff8e1"
-              stroke-width="0.8"
-              paint-order="stroke" data-page-node-id="cmLNA8DesL4ARSBCl8cDCI"
-            >
-              13
-            </text>
-            <text
-              x="90"
-              y="121"
-              text-anchor="middle"
-              font-size="12"
-              letter-spacing="3"
-              fill="#e8c25f" data-page-node-id="w2LghVP4Pk8408AM7kDbOS"
-            >
-              2013 · 2026
-            </text>
-            <path
-              d="M90 1.5 l2.2 5.6 5.6 2.2 -5.6 2.2 -2.2 5.6 -2.2 -5.6 -5.6 -2.2 5.6 -2.2 Z"
-              fill="#fbe7a2" data-page-node-id="NrE1xtxqVkxlS9hG5zrr7q"
-            />
-          </svg>
+          <img
+            src="app/img/13th-logo.png?v=20261030-4"
+            alt="13th 2013-2026 周年庆"
+            data-page-node-id="gASNDZ9bTVkrAyyckmfHOM"
+          />
         </div>
         <div class="title-wrap" data-page-node-id="9TCTEH1GL8MoABwhuIT3JK">
           <h1 data-page-node-id="tMiSZUa9S475jgxGeOnpzD">砥砺十三载 · 感恩有你</h1>
@@ -568,7 +499,7 @@
       </div>
     </div>
 
-        <script src="app/js/data.js?v=20261030-3"></script>
-    <script type="module" src="app/js/main.js?v=20261030-3"></script>
+        <script src="app/js/data.js?v=20261030-4"></script>
+    <script type="module" src="app/js/main.js?v=20261030-4"></script>
   </body>
 </html>
