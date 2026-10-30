@@ -1201,16 +1201,22 @@
       }
       /* 说明文字里可点的「激励排名」（2026-10-26 需求）：金色、hover 变亮；
          2026-10-27 去掉了下方那条下划线，只留金色文字，其余不变。
+         2026-10-30 需求：又加回下划线，并把字号放大 2 号（--t5 14px → 16px），
+         让它在整行灰色说明文字里更突出。font-size 必须写在 font: inherit 之后，
+         否则会被 font 简写重置回父级的 14px。
          用 button 实现是为了能键盘 Tab + 回车，外观完全当文字看。 */
       .hero-note .note-link {
         font: inherit;
+        font-size: 16px;
         letter-spacing: inherit;
         color: var(--gold-num);
         background: none;
         border: none;
         padding: 0;
         cursor: pointer;
-        text-decoration: none;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
       }
       .hero-note .note-link:hover,
       .hero-note .note-link:focus-visible {
