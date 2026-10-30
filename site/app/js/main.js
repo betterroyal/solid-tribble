@@ -241,14 +241,18 @@
         `<i class="kd-t">第</i><b class="kd-n">${Math.round(n)}</b><i class="kd-t">天</i>`;
       setTxt("vDaysTotal", `共 ${D} 天`);
       /* 累计初诊卡：2026-10-16 起小字行只留「基础 X 人」，
-         「客单 xxx 元」搬去独立的「平均单体」卡（见下面的 vAvgTicket）。 */
-      setTxt("subInit", `基础 ${fmtI(totalInitBase)} 人`);
+         「客单 xxx 元」搬去独立的「平均单体」卡（见下面的 vAvgTicket）。
+         2026-10-30 需求：文案「基础」改为「目标」（与卡内圆环的口径叫法统一）。 */
+      setTxt("subInit", `目标 ${fmtI(totalInitBase)} 人`);
       /* 平均单体（2026-10-16 新增卡）= 六个店业绩之和 ÷ 六个店初诊之和 = KPI.avgTicket（元），
          与「累计初诊」完全同源（data.js 汇总）。
          小字行 2026-10-19 改为「今日单体」= 今日业绩 ÷ 今日初诊（同样按元算），
-         今日初诊为 0 时无法相除，显示「—」。 */
+         今日初诊为 0 时无法相除，显示「—」。
+         2026-10-30 需求：金额后面补「元」单位（与上方大数字的单位一致）。 */
       const todayTicketHTML = (k) =>
-        k.todayInit ? `今日单体：${fmtY((k.todayRev * 1e4) / k.todayInit)}` : "今日单体：—";
+        k.todayInit
+          ? `今日单体：${fmtY((k.todayRev * 1e4) / k.todayInit)} 元`
+          : "今日单体：—";
       setTxt("vAvgTicket", fmtY(KPI.avgTicket));
       setTxt("subAvgTicket", todayTicketHTML(KPI));
 
@@ -260,11 +264,12 @@
           ? `<b>${fmtI(c.cum)}</b>人 · <b>${fmtW(c.total)}</b>万`
           : `<b>${fmtI(c.cum)}</b>人 · 目标 <b>${fmtI(c.target)}</b>人`;
       /* 小组 chip 的小字行（2026-10-19 需求）：改为「今日初诊：N 人」。
-         渠道 chip 保持「今日 N · 完成率 R%」不变。 */
+         渠道 chip 保持「今日 N · 完成率 R%」不变。
+         2026-10-30：数字改挂 .cv-n（字号继承父级），供 fitChipLine() 整行缩放时一起缩。 */
       const chipLine2 = (c) =>
         c.kind === "group"
-          ? `今日初诊：<b style="font-size:14px">${fmtI(c.today)}</b>人`
-          : `今日 <b style="font-size:14px">${fmtI(c.today)}</b> · 完成率 ${c.rate.toFixed(2)}%`;
+          ? `今日初诊：<b class="cv-n">${fmtI(c.today)}</b>人`
+          : `今日 <b class="cv-n">${fmtI(c.today)}</b> · 完成率 ${c.rate.toFixed(2)}%`;
       /* 小组 chip 的条（2026-10-16 需求）：黄线填充改为 0%（原先恒为 100% 通长黄线）；
          渠道 chip 仍按完成率填充。小组本身没有可比的完成率口径，黄线会误导。 */
       const chipBarW = (c) =>
@@ -276,7 +281,30 @@
             <div class="chip-val" style="line-height:18px">${chipLine2(c)}</div>
           </div>`;
 
+      /* 2026-10-30 需求：渠道 chip 小字行「今日 19 · 完成率 125.57%」比 chip 宽，
+         原来被 .chip-val 的 ellipsis 截成「125.5…」，完成率看不全。
+         这里按「字数越多、字号越小」自动适配：以 14px 为基准，整行超出可用宽度时
+         等比缩小（下限 10px，仍放不下才截断），保证两个完成率都能完整显示。
+         注意：.chip-val 里加粗的数字用 .cv-n（font:inherit），否则它固定字号会撑破行。 */
+      const CHIP_FS_BASE = 14;
+      const CHIP_FS_MIN = 10;
       let chipRefs = [];
+      function fitChipLine(el) {
+        if (!el) return;
+        el.style.fontSize = "";
+        if (!el.clientWidth) return; // 还没布局（隐藏/宽度为 0）时不要盲缩
+        let fs = CHIP_FS_BASE;
+        // clientWidth/scrollWidth 都是取整值，逐轮收敛，最多 6 轮
+        for (let i = 0; i < 6 && el.scrollWidth > el.clientWidth + 0.5; i++) {
+          const ratio = el.clientWidth / el.scrollWidth;
+          fs = Math.max(CHIP_FS_MIN, Math.floor(fs * ratio * 10) / 10);
+          el.style.fontSize = fs + "px";
+          if (fs <= CHIP_FS_MIN) break;
+        }
+      }
+      const fitChips = () =>
+        chipRefs.forEach((chips) => chips.forEach((ref) => fitChipLine(ref.line2)));
+
       function renderChips(m) {
         const cards = m.channelCards || [];
         chipRefs = cards.map((card) => {
@@ -289,8 +317,12 @@
             line2: el.querySelectorAll(".chip-val")[1],
           }));
         });
+        fitChips();
       }
       renderChips(MODEL);
+      // 字体晚到会改变行宽：等字体就绪再量一次（浏览器不支持则忽略）
+      if (document.fonts && document.fonts.ready)
+        document.fonts.ready.then(() => fitChips()).catch(() => {});
 
       /* ══ 「更多」明细弹窗（2026-10-14 需求）══
          网电卡 → 网电数据 + 老带新数据；市场卡 → 市场数据 + 市场各小组数据。
@@ -503,6 +535,7 @@
             if (ref.bar) ref.bar.style.width = chipBarW(c) + "%";
           });
         });
+        fitChips(); // 内容变了要重新按字数适配字号（心跳每 5 分钟走一次）
       }
 
       /* ══════════════════════════════════════════════════════════
@@ -1558,7 +1591,7 @@
         setN("vTodayRev", m.kpi.todayRev, fmt2);
         setN("vAvgTicket", m.kpi.avgTicket, fmtY); // 平均单体（2026-10-16 新增卡）
         setTxt("subAvgTicket", todayTicketHTML(m.kpi)); // 今日单体（2026-10-19）
-        $("subInit").textContent = `基础 ${fmtI(m.totalInitBase)} 人`;
+        $("subInit").textContent = `目标 ${fmtI(m.totalInitBase)} 人`;
         const to = {
           time: m.kpi.timePct,
           init: m.kpi.initPct,

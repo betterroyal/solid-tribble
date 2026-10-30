@@ -845,11 +845,15 @@
         font-size: var(--t5);
         color: var(--text-sub);
       }
+      /* 2026-10-30 需求：KPI 卡下方小字统一成「今日单体」那行（.kpi-sub）的样子
+         —— 字号 14px、不加字距。原来这里是 12px + 1px 字距，
+         放在「共 31 天 / 基础 N 人 / 今日单体」同一排里明显偏小偏散。
+         行高仍取 18px，与 .kpi-sub 一致（今日数据卡 8+18+40+18 = 84 ≤ 86 内容高，不会顶出边框）。 */
       .td-cap {
-        font-size: 12px;
+        font-size: var(--t5);
         color: var(--text-dim);
-        letter-spacing: 1px;
-        line-height: 14px;
+        letter-spacing: 0;
+        line-height: 18px;
         white-space: nowrap;
       }
       /* .td-sep（今日初诊 / 今日业绩 之间的竖线）已于 2026-10-16 按需求删除：
@@ -914,6 +918,16 @@
       }
       .chip-val b {
         font: 700 var(--t4) var(--num-font);
+        color: var(--gold-num);
+        margin-right: 2px;
+      }
+      /* 渠道 chip 第二行（今日 N · 完成率 R%）里加粗的数字：
+         字号/行高跟随父级 .chip-val —— main.js 的 fitChipLine() 会按整行宽度
+         等比缩小字号，数字必须跟着缩，否则它固定 14px 仍会把行撑出省略号。 */
+      .chip-val .cv-n {
+        font: inherit;
+        font-weight: 700;
+        font-family: var(--num-font);
         color: var(--gold-num);
         margin-right: 2px;
       }
