@@ -31,7 +31,7 @@
     底部折线，页面不重载。历史日序列固定，增长落在「今天」的
     数据点上；左下角有心跳指示器（倒计时 + 刷新闪烁）。
   ============================================================-->
-        <link rel="stylesheet" href="app/css/style.css?v=20261030-2" />
+        <link rel="stylesheet" href="app/css/style.css?v=20261030-3" />
   </head>
   <body data-page-node-id="v0FKEsf7Q6nRDLdoApuXJm">
     <div id="stage" data-page-node-id="kpHgrNEEkZe6PAno3AZiqG">
@@ -202,11 +202,11 @@
                并把行内对应的数字变金色加粗（数据口径见 main.js 的 STORE_METRIC）。
                「目标」按钮同右栏一样先加 seg-hide 隐藏（排序能力保留）——
                要放出来，删掉那枚按钮 class 里的 seg-hide 即可。
-               2026-10-30 需求：右上角「单位」跟着当前按钮变（业绩/目标=万元、完成率=%、
+               2026-10-30 需求：右上角「单位」跟着当前按钮变（业绩/目标=万元、完成率=「完成率」、
                平均单体=元），所以这枚 .tag 加了 id="tagRev"，由 main.js 的 storeTag() 写入；
                下面 HTML 里的初始文字只是兜底，页面加载后会立刻被覆盖。 -->
           <div class="hd-col">
-            <span class="tag" id="tagRev" data-page-node-id="NDKkVHRwoWOS1iuBsFXWVc">单位：万元</span>
+            <span class="tag" id="tagRev" data-page-node-id="NDKkVHRwoWOS1iuBsFXWVc">完成率</span>
             <div class="seg" data-sort="rowsRev">
               <button type="button" class="seg-btn seg-hide" data-by="target">目标</button>
               <button type="button" class="seg-btn" data-by="amount">业绩</button>
@@ -230,10 +230,10 @@
                这块是人数口径，中间那枚按用户确认叫「初诊」（＝行内的「初诊 282」），
                点它按初诊到诊人数降序并高亮该数字；不叫「业绩」以免和金额口径混。
                「目标」按钮加 seg-hide 先隐藏（排序能力保留）。
-               2026-10-30 需求：右上角「单位」跟着当前按钮变（初诊/目标=人、完成率=%），
+               2026-10-30 需求：右上角「单位」跟着当前按钮变（初诊/目标=人、完成率=「完成率」），
                由 main.js 的 storeTag() 写入 #tagRevisit。 -->
           <div class="hd-col">
-            <span class="tag" id="tagRevisit" data-page-node-id="RQ2RITb6IYQIkKLbBFJFOM">单位：人</span>
+            <span class="tag" id="tagRevisit" data-page-node-id="RQ2RITb6IYQIkKLbBFJFOM">完成率</span>
             <div class="seg" data-sort="rowsRevisit">
               <button type="button" class="seg-btn seg-hide" data-by="target">目标</button>
               <button type="button" class="seg-btn" data-by="amount">初诊</button>
@@ -568,7 +568,7 @@
       </div>
     </div>
 
-        <script src="app/js/data.js?v=20261030-2"></script>
-    <script type="module" src="app/js/main.js?v=20261030-2"></script>
+        <script src="app/js/data.js?v=20261030-3"></script>
+    <script type="module" src="app/js/main.js?v=20261030-3"></script>
   </body>
 </html>

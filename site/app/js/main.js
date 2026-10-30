@@ -848,27 +848,29 @@
          2026-10-27 需求：**条形长度也要跟着当前指标走**（点「业绩」条形就表示业绩）。
          两种口径，跟右栏排行榜 RANK_METRIC 完全一致，避免「数字看业绩、条形还看完成率」：
            abs —— 指标本身就是百分比，直接当条长（只有完成率；>100% 封顶）
-           rel —— 对比型指标，取「本列表最大值」当满条（第一名必满格） */
+           rel —— 对比型指标，取「本列表最大值」当满条（第一名必满格）
+         tag —— 右上角标签的**完整文案**（2026-10-30 加）：万元/元/人 带「单位：」前缀，
+               完成率直接写「完成率」，见下面 storeTag。 */
       const STORE_METRIC = {
         rowsRev: {
           target: {
             val: (s) => s.targetBase,
             hl: "target",
             rel: (s) => s.targetBase,
-            unit: "万元",
+            tag: "单位：万元",
           },
           amount: {
             val: (s) => s.actual,
             hl: "amount",
             rel: (s) => s.actual,
-            unit: "万元",
+            tag: "单位：万元",
           },
-          pct: { val: (s) => s.revPct, hl: "pct", abs: (s) => s.revPct, unit: "%" },
+          pct: { val: (s) => s.revPct, hl: "pct", abs: (s) => s.revPct, tag: "完成率" },
           avg: {
             val: (s) => s.avgTicket,
             hl: "avg",
             rel: (s) => s.avgTicket,
-            unit: "元",
+            tag: "单位：元",
           },
         },
         rowsRevisit: {
@@ -876,26 +878,27 @@
             val: (s) => s.initBase,
             hl: "target",
             rel: (s) => s.initBase,
-            unit: "人",
+            tag: "单位：人",
           },
           amount: {
             val: (s) => initActualOf(s),
             hl: "amount",
             rel: (s) => initActualOf(s),
-            unit: "人",
+            tag: "单位：人",
           },
-          pct: { val: (s) => s.initPct, hl: "pct", abs: (s) => s.initPct, unit: "%" },
+          pct: { val: (s) => s.initPct, hl: "pct", abs: (s) => s.initPct, tag: "完成率" },
         },
       };
       const storeMetric = (id) =>
         (STORE_METRIC[id] || {})[STORE_SORT[id]] || STORE_METRIC[id].pct;
-      /* 面板右上角「单位」标签跟着当前指标走（2026-10-30 需求，做法对齐右栏 rankTag）：
-         完成率、初诊人数、平均单体的口径各不相同 —— 完成率没有单位、平均单体是「元」
-         而不是「万元」，所以不能再把「单位：万元」/「单位：人」写死在 HTML 里。 */
+      /* 面板右上角标签跟着当前指标走（2026-10-30 需求，做法对齐右栏 rankTag）：
+         金额/人数要带「单位：」前缀，完成率不是计量单位、按需求直接写「完成率」
+         （与右栏「… · 完成率」同一文案），所以 tag 存的是**整条文案**而不是单位名，
+         前缀不能在这里统一拼 —— 否则会变成「单位：完成率」。 */
       const STORE_TAG = { rowsRev: "tagRev", rowsRevisit: "tagRevisit" };
       const storeTag = (id) => {
         const el = $(STORE_TAG[id]);
-        if (el) el.textContent = "单位：" + storeMetric(id).unit;
+        if (el) el.textContent = storeMetric(id).tag;
       };
       /* 条形宽度（%）：list 传当前面板已排好序的门店列表，rel 口径要用它求最大值。
          完成率模式与改前完全一致（clamp(revPct,0,100)），所以默认视图看不出变化。 */
