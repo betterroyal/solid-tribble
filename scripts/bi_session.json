@@ -1,7 +1,7 @@
 {
  "rsa_public_key": "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAhYyxWPQ41jZBUjeP5btbwdHYUEzboPvP+7c3PgQUR+1YvXeu0dX7DWqutLc5L1xZ0PYXhAoZGB9zsfKWme2JfYRYs1t2bvs6iF1G+uvDtsOFG8XXCICSC4LstfUmeIj4zxauUI+7QKL9Ptc79j72H627GmCf9eppnXplvUs0/oFKmYxylSCcONiPJ9i/8EKGqn8DV4UuBGb5QW7RFGsoz+k7WCGaXLvaasCU2yHD1SdeZ9LdhWnt0Ecm3C/AiaQOoWlB1rJkh+tezFAS8m51U3OLEu0wX2xWAe6WDpe+mOopHTtQAy1Dnso73zI2mT88N9DQJDFXLNy8sADsh+bZCYFSjIDLJalrbVl/PZSvb3FSAqT6oHObHh9QvdP1JuPJbb61Ldv0h+q/oodlbVwRl1DYF6AgeEs3j43Ao8Pgp6mgZmTg1fF1pcexL0HhB1BYw+JEKsf/cOf4X8G8TXTtcaSzXm74mj6BGLOMEt/kh/DPM1LyTOr6X46oozp0GrDlAgMBAAE=",
  "version": 2,
- "saved_at": 1793433683.210343,
+ "saved_at": 1793433984.0302963,
  "pages": {
   "main": {
    "url": "https://bi.hmccloud.com/bi/viewer?proc=1&action=viewer&hback=true&db=__MY_DB__!2f!2026!5468!!5e74!!5e86!!2f!!6570!!636e!!96c6!!8868!!683c!.db",
@@ -9,81 +9,81 @@
     {
      "role": "preamble",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtPz/m5GBKSXp/z8GzuLU4uLM/DzPFJAYS2axh+n/r05Vkvzzlx9gYOCIT8ssSg0Jjv//FwBAABX6"
+     "body_b64": "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"
     },
     {
      "role": "preamble",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "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"
+     "body_b64": "eJxjtPz/m5GBKSXp/z8GzuLU4uLM/DzPFJAYS2axh+n/r05VkvwvWBgYGDji0zKLUkOC4///BQAwgxTg"
     },
     {
      "role": "preamble",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJw1jzFLw0AYhr+UYGtB7SS4ugt30QZdC5EWUi01oFs4k0tzcOTC5WyNP8DN0cnFbk7iD/D3BAVHBaHoeam6PS8v3/Px2m/6HWx84CBoJLOa9xCqOTVsIWgmTAVlTvXCgpbhUxarVH8CQAfaMZ2yiA6yRNR1kxX9YOh3l60FK0kREU7/U/SbFgCrrDjkpZhSueyMKZdGRGc9IvuUTVKlv2E9E9koFRn1SSku1J+lnbNLysdEMVGb1tgkE5IGQvBzIs1VJ/TORsfjIPR8b+gdBaEZAdDKhVSED2KTtqvbp+rm8fXu+mX+UN0/O8hxMdrF2EUYOTvYdfehweJ6j232dPVH72prY76JjCZMmHl2EuqvHwz0cwg="
+     "body_b64": "eJxjefP/CwOLoaWRAQNTWjmIbWJgAGJnANmMBgzsaZklIZUFqf9/MzJwANnhmSklGf9/MDAwCDBwpaSWZSaneual5YOk2TOLPUJ8fUzBsowMbGnFyYk5qTBeMoT3m4GBM7PYLacyvyy1CCwHNKmgCGhQarlTYpFHamZ6Rsn/fwx8efl5ARn5eak+iZX5pSVQU7gKMitSc4ISSzLzQSbxZqbn5RelhuTn5yQlFgF1CcS7RgT4B4XEu/q4+rr6hcQDPcHAwFGQX1SSmOOZAuQpPpu64Vnvupez214sXPFswR4jAyMzQwNjQ0MzA1NTM11TC6DfM1NA3mEBesf0/1enKkn+l50KQFPi0zKBdgXH//8LAKthc4c="
     },
     {
      "role": "preamble",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjFfj/hYErOSM1Odu1IrO4hIG3uDSpOLkoMyk1pLIgFSjJwMBRkF9UkpjjmfL/NyMDe2axR4ivjylQRunZ1A3Pete9nN32YuGKZwv2GBkYmRkaGBsamhkYGhjpGpqZWTAwZYJ1sQB1mf7/6lQlyb9QXAFoZHxaZlFqSHD8/78AIJ8ykA=="
+     "body_b64": "eJxjFfj/hYErOSM1Odu1IrO4hIG3uDSpOLkoMyk1pLIgFSjJwMBRkF9UkpjjmfL/NyMDe2axR4ivjylQRvHZ1A3Pete9nN32YuGKZwv2GBkYmRkaGBsamhmYmprpmloYMDBlgjWxADWZ/v/qVCXJ/7IrAWhifFpmUWpIcPz/vwAD5DNf"
     },
     {
      "role": "data",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYH96ex9LxauMGRgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJik1gYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/Rs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA0MDI11DMzMLBqZMsC4WoC7T/1+dqiT5F7YaAI2MT8ssSg0Jjv//FwAAB0ks",
+     "body_b64": "eJxjtP//hYH96ex9LxauMGRgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJir1iYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/hs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA1NTM11TCwMGpkywJhagJtP/X52qJPlfeSYATYxPyyxKDQmO//8XAOw+SZc=",
      "name": "门店数据"
     },
     {
      "role": "data",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYH96ex9LxauMGNgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJik1gYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/Rs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA0MDI11DMzMLBqZMsC4WoC7T/1+dqiT5F7YmAI2MT8ssSg0Jjv//FwAGEklh",
+     "body_b64": "eJxjtP//hYH96ex9LxauMGNgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJir1iYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/hs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA1NTM11TCwMGpkywJhagJtP/X52qJPlfeW4AmhifllmUGhIc//8vAPQESew=",
      "name": "网电数据"
     },
     {
      "role": "data",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYH96ex9LxauMGFgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJik1gYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/Rs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA0MDI11DMzMLBqZMsC4WoC7T/1+dqiT5F7Y2AI2MT8ssSg0Jjv//FwAGdEl/",
+     "body_b64": "eJxjtP//hYH96ex9LxauMGFgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJir1iYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/hs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA1NTM11TCwMGpkywJhagJtP/X52qJPlfeV4AmhifllmUGhIc//8vAPRoSgo=",
      "name": "市场数据"
     },
     {
      "role": "data",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYH96ex9LxauMGVgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJik1gYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/Rs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA0MDI11DMzMLBqZMsC4WoC7T/1+dqiT5F7ZOABoZn5ZZlBoSHP//LwAIA0mQ",
+     "body_b64": "eJxjtP//hYH96ex9LxauMGVgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJir1iYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/hs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA1NTM11TCwMGpkywJhagJtP/X52qJPlfeX4AmhifllmUGhIc//8vAPbWSis=",
      "name": "老带新数据"
     },
     {
      "role": "data",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYH96ex9LxausGRgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJik1gYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/Rs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA0MDI11DMzMLBqZMsC4WoC7T/1+dqiT5F7YuABoZn5ZZlBoSHP//LwALn0mk",
+     "body_b64": "eJxjtP//hYH96ex9LxausGRgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJir1iYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/hs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA1NTM11TCwMGpkywJhagJtP/X52qJPlfeQkATYxPyyxKDQmO//8XAO1dSVA=",
      "name": "咨询数据-完成率排名(周)"
     },
     {
      "role": "data",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYH96ex9LxausGBgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJik1gYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/Rs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA0MDI11DMzMLBqZMsC4WoC7T/1+dqiT5F7ZuABoZn5ZZlBoSHP//LwAL0Emz",
+     "body_b64": "eJxjtP//hYH96ex9LxausGBgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJir1iYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/hs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA1NTM11TCwMGpkywJhagJtP/X52qJPlfeSkATYxPyyxKDQmO//8XAO2PSV8=",
      "name": "咨询数据-平均单体排名(周)"
     },
     {
      "role": "data",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYH96ex9LxauMGJgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJik1gYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/Rs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA0MDI11DMzMLBqZMsC4WoC7T/1+dqiT5F7ZeABoZn5ZZlBoSHP//LwAJdknN",
-     "name": "咨询数据"
-    },
-    {
-     "role": "data",
-     "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYH96ex9LxauMGZgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJik1gYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/Rs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA0MDI11DMzMLBqZMsC4WoC7T/1+dqiT5F7YeABoZn5ZZlBoSHP//LwAJRUm+",
+     "body_b64": "eJxjtP//hYH96ex9LxauMGZgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJir1iYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/hs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA1NTM11TCwMGpkywJhagJtP/X52qJPlfeTkATYxPyyxKDQmO//8XAOvpSXo=",
      "name": "医生数据"
     },
     {
      "role": "data",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYHj6ex9LxauMDRgYMlLzE39/4OBgYGdgTUjM6+kGMrhLC1KT81Lzkwt/v8byC9KTStKLc4ASYpNYGAtyc9OzQNJcCYnJmekpnjmFQONZWDgKMgvKknM8Uz5/5uRgT2z2CPE18cUKKP0bOqGZ73rXs5uA1r7bMEeIwMjM0MDY0NDMwNDAyNdQzMzCwamTLAuFqAu0/9fnaok+Re2PgAaGZ+WWZQaEhz//y8AMglKDQ==",
+     "body_b64": "eJxjtP//hYH96ex9LxauMGJgyUvMTf3/g4GBgZ2BNSMzr6QYyuEsLUpPzUvOTC3+/xvIL0pNK0otzgBJir1iYC3Jz07NA0lwJicmZ6SmeOYVA01lYOAoyC8qSczxTPn/m5GBPbPYI8TXxxQoo/hs6oZnvetezm4D2vpswR4jAyMzQwNjQ0MzA1NTM11TCwMGpkywJhagJtP/X52qJPlfeQUATYxPyyxKDQmO//8XAOwbSYk=",
+     "name": "咨询数据"
+    },
+    {
+     "role": "data",
+     "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
+     "body_b64": "eJxjtP//hYHj6ex9LxauMDRgYMlLzE39/4OBgYGdgTUjM6+kGMrhLC1KT81Lzkwt/v8byC9KTStKLc4ASYq9YmAtyc9OzQNJcCYnJmekpnjmFQONZWDgKMgvKknM8Uz5/5uRgT2z2CPE18cUKKP4bOqGZ73rXs5uA1r7bMEeIwMjM0MDY0NDMwNTUzNdUwsDBqZMsCYWoCbT/1+dqiT5X3k1AE2MT8ssSg0Jjv//FwAWTUnp",
      "name": "门店数据-完成率排名(周)"
     },
     {
      "role": "data",
      "url": "https://bi.hmccloud.com/bi/viewer?isAjax=true&proc=1&platform=PC&deviceType=16&action=req&__level1__=viewer",
-     "body_b64": "eJxjtP//hYHj6ex9LxauMDRnYMlLzE39/4OBgYGdgTUjM6+kGMrhLC1KT81Lzkwt/v8byC9KTStKLc4ASYpNYGAtyc9OzQNJcCYnJmekpnjmFQONZWDgKMgvKknM8Uz5/5uRgT2z2CPE18cUKKP0bOqGZ73rXs5uA1r7bMEeIwMjM0MDY0NDMwNDAyNdQzMzCwamTLAuFqAu0/9fnaok+Re2fgAaGZ+WWZQaEhz//y8AN7JKJA==",
+     "body_b64": "eJxjtP//hYHj6ex9LxauMDRnYMlLzE39/4OBgYGdgTUjM6+kGMrhLC1KT81Lzkwt/v8byC9KTStKLc4ASYq9YmAtyc9OzQNJcCYnJmekpnjmFQONZWDgKMgvKknM8Uz5/5uRgT2z2CPE18cUKKP4bOqGZ73rXs5uA1r7bMEeIwMjM0MDY0NDMwNTUzNdUwsDBqZMsCYWoCbT/1+dqiT5X3lNAJoYn5ZZlBoSHP//LwAb70oA",
      "name": "市场各小组数据"
     }
    ]
