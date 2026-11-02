@@ -84,6 +84,12 @@ def to_number(s):
 
 
 def build_payload(name, rows):
+    """按 BI 返回的表头逐列落盘 —— 这里不做列白名单。
+
+    所以 BI 侧新增列（如 2026-11-02 门店数据新增的「总天数」）会自动进 JSON，
+    前端只要按列名取值即可，取数脚本不用改。仅当列名被改名时才需要动代码
+    （HEADER_CHECK 会先拦住，避免张冠李戴）。
+    """
     if not rows or len(rows) < 2:
         return {"columns": [], "rows": [], "empty": True}
     header = rows[0]

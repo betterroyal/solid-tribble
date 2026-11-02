@@ -339,16 +339,23 @@
   }
 
   function buildModel(storesRaw, consultsRaw, doctorsRaw, chanRaws, dailyRaw, groupsRaw, rankRaws) {
-    /* ── 活动进程：BI"天数/时间进度"列 = 第 N 天 / 共 31 天 ── */
-    const D = 31;
-    const T = Math.min(
-      D,
-      Math.max(1, Math.round(num(storesRaw.rows[0] && storesRaw.rows[0]["天数"])) || 28),
-    );
+    /* ── 活动进程（2026-11-02 需求：三处数值全部吃 BI「门店数据」首行）──
+       总天数   → D = 「共 X 天」的天数，也是坐标轴长度 / 时间进度环的分母
+       天数     → T = 「第 X 天」（活动第几天，第 1 天 = 活动首日）
+       时间进度 → kpi.timePct，百分比直接取 BI 的值，不再前端自算 T/D
+       BI 少列 / 值为空时逐个回退（D=31、T=28、百分比=T/D），老行为不变。 */
+    const headRow = (storesRaw.rows && storesRaw.rows[0]) || {};
+    const biTotalDays = Math.round(num(headRow["总天数"]));
+    const D = biTotalDays > 0 ? biTotalDays : 31;
+    const T = Math.min(D, Math.max(1, Math.round(num(headRow["天数"])) || 28));
+    /* 时间进度：BI 给的就是「天数 ÷ 总天数」的百分比（实测 33/46=71.74），直接用；
+       缺列或空串时才退回自算，避免 BI 改版把这张卡打成 0%。 */
+    const rawTimePct = headRow["时间进度"];
+    const hasTimePct = rawTimePct !== "" && rawTimePct != null && !isNaN(+rawTimePct);
+    const biTimePct = hasTimePct ? +rawTimePct : (T / D) * 100;
     /* ── 活动窗口（动态，2026-10-13 起）──
-       BI 门店表的「天数」列 = 活动第几天（第 1 天 = 活动首日）。用「今天(北京) − (T-1) 天」
-       反推首日，于是：活动跨月/跨年时页面自动跟着走，不再写死 9 月。
-       D（30 天）只用于坐标轴长度与「时间进度」环，与 BI「共 30 天」一致。 */
+       用「今天(北京) − (T-1) 天」反推首日，活动跨月/跨年时页面自动跟着走。
+       D 只用于坐标轴长度与「时间进度」环，与 BI「共 X 天」一致。 */
     const firstDate = cnNow();
     firstDate.setDate(firstDate.getDate() - (T - 1));
     const dayDates = [];
@@ -646,7 +653,7 @@
     const totalTodayInit = stores.reduce((a, s) => a + (s.todayInit || 0), 0);
     const totalTodayRev = stores.reduce((a, s) => a + (s.todayRev || 0), 0);
     const kpi = {
-      timePct: (T / D) * 100,
+      timePct: biTimePct,
       revPct: totalBase ? (totalRev / totalBase) * 100 : 0,
       initPct: totalInitBase ? (totalInit / totalInitBase) * 100 : 0,
       avgTicket: totalInit ? (totalRev * 1e4) / totalInit : 0,
