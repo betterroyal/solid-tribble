@@ -232,9 +232,12 @@
          右侧 .clock 用 justify-content:flex-end + padding-bottom:8px，日期行盒子底边在 88-8=80；
          日期 14px 文字在 19.6px 行高里居中，墨迹底边约在 76。标志按 10px 底部内缩后墨迹底边也在 76，
          两侧视觉底边齐平（硬编码 10px 而不是 8px，是因为标志 PNG 底部还差 2px 透明边）。 */
+      /* 2026-11-04：标志左边缘看起来比下方卡片"突出去"了一点（金饰飞出笔画在左，
+         视觉重量压在左边线上），整体右移 8px 回到视觉齐平。容器仍按 32px 栅格，
+         位移只加在 .logo 上，不影响 .kpis / .h-sep 的左边线。 */
       .logo {
         position: absolute;
-        left: var(--sp-4);
+        left: calc(var(--sp-4) + 8px);
         bottom: 10px;
         height: 55px;
       }
