@@ -238,8 +238,17 @@
                   实测逐店一致；取不到才退回 总目标 ÷ D），
                   完成率 = 今日实收 ÷ 日目标 × 100，前端重算。
      目标为 0 的店（BI 里的「医院」）算不出完成率，不参与排名。
-     输出按日期降序（今天在最上），每天固定取前二名。 */
-  function buildDailyTop2(dailyRaw, stores, D) {
+     输出按日期降序（今天在最上），每天固定取前二名。
+
+     日期范围（2026-11-10 用户要求）：表里只出「BI 报表统计窗口」内的日期 ——
+       起点 = 门店表「天数」反推出的活动首日（即 BI 报表里看到的第一天，当前 10-01），
+       终点 = 今天。窗口之前的日期一律不出表。
+     为什么要这层过滤：daily.json 的抓取起点是写死的 2026-08-15（见
+       scripts/bi_api.py 的 DAILY_START，多留些历史给曲线兜底），所以 BI 每天会
+       带回 8 月、9 月的行；曲线按窗口裁掉了，这张表以前没裁，弹窗往下滚就能
+       看到 8/9 月的日期，和 BI 报表里对不上（2026-11-10 用户反馈）。
+       ⚠ 别把这里改成「固定 10-01」：活动期是滚动的，起点必须跟着 BI 的「天数」走。 */
+  function buildDailyTop2(dailyRaw, stores, D, start) {
     const rows = (dailyRaw && dailyRaw.rows) || [];
     const cols = (dailyRaw && dailyRaw.columns) || [];
     const revAlias = {}; // BI 名 → 页面名（医院 → 三级医院）
@@ -261,6 +270,9 @@
     /* 完成率口径：BI 每日表给的是百分数（198.65）。若哪天改成 0~1 小数，按整列最大值
        ≤10 判定后 ×100 —— 与 buildIncentive 同一套判别，不能逐值判断（1.663 这种会被误算）。 */
     const rateK = cRate ? (Math.max(...rows.map((r) => num(r[cRate])), 0) <= 10 ? 100 : 1) : 1;
+    /* 统计窗口起点（活动首日，来自 BI 门店表「天数」）→ yyyymmdd 整数，和 day.num 同量纲。
+       传空（理论上不会）时退化成 0 = 不过滤，宁可多显示也别把整张表清空。 */
+    const startNum = start ? start.year * 10000 + start.month * 100 + start.day : 0;
 
     const dayOf = (s) => {
       const m = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(String(s == null ? "" : s));
@@ -319,11 +331,16 @@
     /* 日期降序：今天在最上；同一天内完成率降序取前二。
        ⚠ 跳过「整日实收全为 0/空」的日期：BI 每日表里最新一天常常是空壳（当天还没结算，
        实测 10-26 全店实收都是空字符串），照画会显示成 0.00% 的两行，看着像业绩掉零。
-       今日行例外 —— 它是门店表实时值，凌晨确实是 0 也要如实显示。 */
+       今日行例外 —— 它是门店表实时值，凌晨确实是 0 也要如实显示。
+       ⚠ 再跳过「统计窗口起点之前」的日期（2026-11-10 用户要求）：BI 每日表从
+       2026-08-15 起就有行，但看板的统计窗口是从活动首日（当前 10-01）开始，
+       表和曲线的日期范围必须一致，否则弹窗里会冒出上个月、上上个月。
+       今日行同样例外（它的 num 恒为今天，本来就在窗口内）。 */
     const out = [];
     [...days.values()]
       .sort((a, b) => b.num - a.num)
       .forEach((d) => {
+        if (!d.today && d.num < startNum) return;
         if (!d.today && !d.items.some((it) => it.actual > 0)) return;
         out.push({
           date: `${d.y}年${d.m}月${d.d}日`,
@@ -594,8 +611,10 @@
     const incentive = buildIncentive(rankRaws || {});
 
     /* 每日业绩完成率 TOP2（2026-10-27 需求）：每日表取历史、门店表补今日，
-       结果挂在「激励排名」弹窗左边的表格上。详见 buildDailyTop2 的注释。 */
-    const dailyTop2 = buildDailyTop2(dailyRaw, stores, D);
+       结果挂在「激励排名」弹窗左边的表格上。详见 buildDailyTop2 的注释。
+       第 4 个参数 = 统计窗口起点（活动首日），表里只出这个日期之后的行，
+       与曲线、时间进度同一口径（2026-11-10 用户要求：日期跟着 BI 报表走）。 */
+    const dailyTop2 = buildDailyTop2(dailyRaw, stores, D, CAMPAIGN_START);
 
     /* ── 每日实收（动态活动窗口）：daily.json 时间形如"2026年10月13日"，元 → 万。
        按下标 = 该日期距活动首日的天数入列；窗口外的日期（如 BI 里更早的历史）直接忽略。
