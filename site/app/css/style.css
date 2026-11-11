@@ -269,7 +269,9 @@
         font-display: swap;
       }
       .title-wrap h1 {
-        font-size: 40px;
+        /* 2026-11-11：字号按需求「大 2 号」由 40px 提到 48px（+8px），
+           其余（字重 / 字距 8px / 金色渐变）保持不变。 */
+        font-size: 48px;
         font-weight: 700;
         letter-spacing: 8px;
         font-family: "TitleBrush", "STXingkai", "华文行楷", "KaiTi", serif;
