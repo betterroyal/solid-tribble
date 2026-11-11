@@ -257,10 +257,22 @@
         justify-content: center;
         gap: 2px;
       }
+      /* 2026-11-11 需求：头部标题换成毛笔手写体（参考设计稿「砥砺十年 感恩有你」那种粗毛笔楷）。
+         用「阿里妈妈东方大楷」——由多宝塔碑算法生成，阿里官方免费商用，字形粗细与参考稿最接近。
+         字体只保留标题用到的 9 个字（十三而砺·微笑启城），子集后 3.4KB，放在 app/fonts/。
+         色彩、字号、字距、渐变全部沿用原样式，只换 font-family。 */
+      @font-face {
+        font-family: "TitleBrush";
+        src: url("../fonts/dongfang-dakai-title.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
       .title-wrap h1 {
         font-size: 40px;
         font-weight: 700;
         letter-spacing: 8px;
+        font-family: "TitleBrush", "STXingkai", "华文行楷", "KaiTi", serif;
         /* 2026-11-11：letter-spacing 会在最后一个字**后面**也补 8px，
            居中时整行字形看起来偏左 4px（实测墨迹中心 956，画布中心 960）。
            左侧补一个字距把这段空白抵掉，字形墨迹回到正中 960。 */
