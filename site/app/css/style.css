@@ -297,12 +297,17 @@
         color: transparent;
         white-space: nowrap;
       }
-      /* 2026-11-11：设计稿标题图（2 倍图 960×112，显示 480×56）。
-         480 是原来 48px 文字标题的实测宽度（479.8），所以换了图视觉大小不变。 */
+      /* 2026-11-11：设计稿标题图（原图 3508×541，导出 2 倍图 960×112）。
+         尺寸换算基准：48px 文字标题实测宽 479.8px → 图片 480px 时视觉等大。
+         2026-11-11 二次调整（需求：图片稍微小一些、字号小 1-2 号、位置稍微低一点）：
+         「1 号 = 4px」，取中间档 42px 等效 → 480 × 42/48 = 420px 宽，
+         高按原图比例 420/8.5729 ≈ 49px。用 transform 下移 4px（不动布局，垂直中心 44 → 48），
+         避免改 margin 影响 flex 居中。 */
       .title-wrap h1 .title-pic {
         display: block;
-        width: 480px;
+        width: 420px;
         height: auto;
+        transform: translateY(4px);
         -webkit-user-drag: none;
         user-select: none;
       }
