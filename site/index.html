@@ -47,14 +47,15 @@
             data-page-node-id="gASNDZ9bTVkrAyyckmfHOM"
           />
         </div>
-        <!-- 2026-10-30 需求：头部中央的大标题「砥砺十三载 · 感恩有你」和副标题
-             「13周年庆数据看板 · 2026年10月」都先删掉（头部只留左侧标志 + 右侧时钟）。
-             对应的 .title-wrap 样式仍保留在 style.css 里，要恢复时把下面这段注释放开即可。
+        <!-- 2026-10-30 曾按需求整块删除中央大标题（头部只留左侧标志 + 右侧时钟）。
+             2026-11-11 需求：恢复这块标题，文案改为周年庆主题「十三而砺·微笑启城」，
+             版式沿用原 .title-wrap（金色渐变 40px / 字距 8px / 居中，副标题在下方一行）——
+             样式不需要动，style.css 里的 .title-wrap 一直保留着。
+             副标题的文案由 main.js 的 setTxt("subTitle", …) 动态写入（判空安全）。 -->
         <div class="title-wrap" data-page-node-id="9TCTEH1GL8MoABwhuIT3JK">
-          <h1 data-page-node-id="tMiSZUa9S475jgxGeOnpzD">砥砺十三载 · 感恩有你</h1>
+          <h1 data-page-node-id="tMiSZUa9S475jgxGeOnpzD">十三而砺·微笑启城</h1>
           <div class="subtitle" id="subTitle" data-page-node-id="unRnWkU2URs4cFyrSFijpP">13周年庆数据看板 · —</div>
         </div>
-        -->
         <div class="clock" data-page-node-id="I2EozdVsNFKLFbrP7CSTph">
           <div class="t" id="clkTime" data-page-node-id="CklAXqz7jNYkuGRezKDurt">--:--:--</div>
           <div class="d" id="clkDate" data-page-node-id="HKp1TdW5JFSPURgOC2ITIA">————</div>
