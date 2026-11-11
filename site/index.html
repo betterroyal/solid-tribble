@@ -31,7 +31,7 @@
     底部折线，页面不重载。历史日序列固定，增长落在「今天」的
     数据点上；左下角有心跳指示器（倒计时 + 刷新闪烁）。
   ============================================================-->
-        <link rel="stylesheet" href="app/css/style.css?v=20261104-02" />
+        <link rel="stylesheet" href="app/css/style.css?v=20261111-01" />
   </head>
   <body data-page-node-id="v0FKEsf7Q6nRDLdoApuXJm">
     <div id="stage" data-page-node-id="kpHgrNEEkZe6PAno3AZiqG">
@@ -49,12 +49,12 @@
         </div>
         <!-- 2026-10-30 曾按需求整块删除中央大标题（头部只留左侧标志 + 右侧时钟）。
              2026-11-11 需求：恢复这块标题，文案改为周年庆主题「十三而砺·微笑启城」，
-             版式沿用原 .title-wrap（金色渐变 40px / 字距 8px / 居中，副标题在下方一行）——
-             样式不需要动，style.css 里的 .title-wrap 一直保留着。
-             副标题的文案由 main.js 的 setTxt("subTitle", …) 动态写入（判空安全）。 -->
+             版式沿用原 .title-wrap（金色渐变 40px / 字距 8px / 居中）。
+             同日二次调整：删掉下方小字副标题，标题单独在 88px 头部里垂直+水平居中
+             （.title-wrap 是 flex 列 + justify-content:center，只剩一行时自然居中）。
+             副标题元素已移除，main.js 里对应的 setTxt("subTitle", …) 是判空安全的，不会报错。 -->
         <div class="title-wrap" data-page-node-id="9TCTEH1GL8MoABwhuIT3JK">
           <h1 data-page-node-id="tMiSZUa9S475jgxGeOnpzD">十三而砺·微笑启城</h1>
-          <div class="subtitle" id="subTitle" data-page-node-id="unRnWkU2URs4cFyrSFijpP">13周年庆数据看板 · —</div>
         </div>
         <div class="clock" data-page-node-id="I2EozdVsNFKLFbrP7CSTph">
           <div class="t" id="clkTime" data-page-node-id="CklAXqz7jNYkuGRezKDurt">--:--:--</div>

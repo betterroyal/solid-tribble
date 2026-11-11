@@ -261,6 +261,10 @@
         font-size: 40px;
         font-weight: 700;
         letter-spacing: 8px;
+        /* 2026-11-11：letter-spacing 会在最后一个字**后面**也补 8px，
+           居中时整行字形看起来偏左 4px（实测墨迹中心 956，画布中心 960）。
+           左侧补一个字距把这段空白抵掉，字形墨迹回到正中 960。 */
+        padding-left: 8px;
         background: linear-gradient(
           180deg,
           #fdf3cd 0%,
