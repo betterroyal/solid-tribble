@@ -257,13 +257,19 @@
         justify-content: center;
         gap: 2px;
       }
-      /* 2026-11-11 需求：头部标题换成毛笔手写体（参考设计稿「砥砺十年 感恩有你」那种粗毛笔楷）。
-         用「阿里妈妈东方大楷」——由多宝塔碑算法生成，阿里官方免费商用，字形粗细与参考稿最接近。
-         字体只保留标题用到的 9 个字（十三而砺·微笑启城），子集后 3.4KB，放在 app/fonts/。
-         色彩、字号、字距、渐变全部沿用原样式，只换 font-family。 */
+      /* 2026-11-11 需求：头部标题换成毛笔手写体，指定字库为「汉仪尚巍手书」。
+         ⚠ 汉仪尚巍手书是商业字库，本机与仓库里都没有字体文件（已扫过 732 个已装字体，
+           无此字形），无法内嵌分发。因此这里用 local() 优先命中本机已安装的
+           「汉仪尚巍手书」各版本；没装该字体的机器自动落到内嵌的
+           「阿里妈妈东方大楷」子集（免费商用，粗细与参考稿最接近，9 个字 3.4KB）。
+         要把标题在所有机器上统一成汉仪尚巍手书：把 .ttf/.otf 放到 app/fonts/ 后，
+         在这里的 src 里把 url(...) 换成该文件（或让我做 9 字子集），其余不用动。 */
       @font-face {
         font-family: "TitleBrush";
-        src: url("../fonts/dongfang-dakai-title.woff2") format("woff2");
+        src: local("汉仪尚巍手书W"), local("HYShangWeiShouShuW"),
+          local("汉仪尚巍手书"), local("HYShangWeiShouShu"),
+          local("汉仪尚巍手书简"), local("HYShangWeiShouShuJ"),
+          url("../fonts/dongfang-dakai-title.woff2") format("woff2");
         font-weight: 400;
         font-style: normal;
         font-display: swap;
@@ -274,7 +280,8 @@
         font-size: 48px;
         font-weight: 700;
         letter-spacing: 8px;
-        font-family: "TitleBrush", "STXingkai", "华文行楷", "KaiTi", serif;
+        font-family: "TitleBrush", "汉仪尚巍手书W", "HYShangWeiShouShuW",
+          "汉仪尚巍手书", "STXingkai", "华文行楷", "KaiTi", serif;
         /* 2026-11-11：letter-spacing 会在最后一个字**后面**也补 8px，
            居中时整行字形看起来偏左 4px（实测墨迹中心 956，画布中心 960）。
            左侧补一个字距把这段空白抵掉，字形墨迹回到正中 960。 */
