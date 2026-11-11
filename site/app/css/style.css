@@ -275,17 +275,16 @@
         font-display: swap;
       }
       .title-wrap h1 {
-        /* 2026-11-11：字号按需求「大 2 号」由 40px 提到 48px（+8px），
-           其余（字重 / 字距 8px / 金色渐变）保持不变。 */
+        /* 2026-11-11：标题改为设计稿图片（见 index.html 的 .title-pic）。
+           下面这套字号/字距/渐变只对图片加载失败时的 alt 文字生效，不再影响布局：
+           图片宽高由 .title-pic 独立控制，所以把 letter-spacing 与 padding-left 归零，
+           否则 h1 的内边距会把图片整体右推 4px。 */
         font-size: 48px;
         font-weight: 700;
-        letter-spacing: 8px;
+        letter-spacing: 0;
         font-family: "TitleBrush", "汉仪尚巍手书W", "HYShangWeiShouShuW",
           "汉仪尚巍手书", "STXingkai", "华文行楷", "KaiTi", serif;
-        /* 2026-11-11：letter-spacing 会在最后一个字**后面**也补 8px，
-           居中时整行字形看起来偏左 4px（实测墨迹中心 956，画布中心 960）。
-           左侧补一个字距把这段空白抵掉，字形墨迹回到正中 960。 */
-        padding-left: 8px;
+        padding-left: 0;
         background: linear-gradient(
           180deg,
           #fdf3cd 0%,
@@ -297,6 +296,15 @@
         background-clip: text;
         color: transparent;
         white-space: nowrap;
+      }
+      /* 2026-11-11：设计稿标题图（2 倍图 960×112，显示 480×56）。
+         480 是原来 48px 文字标题的实测宽度（479.8），所以换了图视觉大小不变。 */
+      .title-wrap h1 .title-pic {
+        display: block;
+        width: 480px;
+        height: auto;
+        -webkit-user-drag: none;
+        user-select: none;
       }
       .title-wrap .subtitle {
         font-size: var(--t5);
