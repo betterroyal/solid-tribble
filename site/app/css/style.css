@@ -1319,13 +1319,8 @@
       .store-label.left {
         left: calc(var(--u) * -34);
       }
-      /* 2026-11-13 需求：右列三个框往中间收一点。
-         原来与左列同用 -34u（框右缘超出 hero 模块 30px，离右栏 pDoctor 只剩 18px，
-         看着像贴着右侧面板）。右列单独收窄到 -12u —— 整体左移 22u≈19.6px：
-         右缘落在模块外 10.6px、与右栏面板的间距从 18px 增到 38px，
-         与圆环外缘的间距从 35.6px 收到 16px（左列不动，仍是 35.6px）。 */
       .store-label.right {
-        right: calc(var(--u) * -12);
+        right: calc(var(--u) * -34);
         flex-direction: row-reverse;
         text-align: right;
       }

@@ -741,10 +741,21 @@
       window.addEventListener("load", () =>
         labels.forEach((el) => el && fitTodayVal(el)),
       );
+      /* 门店框的纵向微调（2026-11-13 需求：右列的神华店、校园店向中间的包百店
+         靠近一点）。基准 y 仍由段中心角算出，这里只叠一个按槽位给定的位移，
+         单位是 viewBox 用户单位（1u≈0.889px），随模块等比缩放。
+         正值 = 下移，负值 = 上移；没列出的槽位不偏移。
+         右列原来框心 276 / 494 / 712（间距 218px、框间缝隙 110px），
+         上下各收 22u≈19.6px 后变成 295.6 / 494.1 / 692.6（间距 198.5px、
+         缝隙 71px），包百店居中不动。左列两个框位置不变。 */
+      const LABEL_DY = { "right-top": 22, "right-bottom": -22 };
       HERO.forEach((s, i) => {
         const seg = SEGMENTS[i];
         const center = seg.start + H.SEG_SPAN / 2;
-        const y = H.CY + H.R_LABEL * Math.sin((center * Math.PI) / 180);
+        const y =
+          H.CY +
+          H.R_LABEL * Math.sin((center * Math.PI) / 180) +
+          (LABEL_DY[seg.slot] || 0);
         const side = seg.slot.startsWith("right") ? "right" : "left";
         const el = document.createElement("div");
         el.className = `store-label ${side}`;
