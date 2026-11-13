@@ -29,7 +29,9 @@
       九星店: { color: "#c99572", revisit: 62 },
       青东店: { color: "#8fb5a4", revisit: 81 },
       包百店: { color: "#86a0b4", revisit: 66 },
-      校园店: { color: "#cfc9ba", revisit: 59 },
+      /* 2026-11-13 需求：校园店改用原来「九星店」的色值 #c99572（原 #cfc9ba 偏灰，
+         九星下线后这个暖铜色正好空出来）。弧段、列表圆点、框里的条形都用这一处。 */
+      校园店: { color: "#c99572", revisit: 59 },
       三级医院: { color: "#b98da0", revisit: 78 },
     },
     /* 尚未进 BI 的门店：用配置值先占位（实收=目标×完成率），保住版式。
@@ -40,10 +42,12 @@
        要临时恢复占位展示：把 { id:"sy", name:"三级医院", color:"#b98da0",
        targetBase:270, revPct:68.1, initBase:740, initPct:64.3, revisit:78 } 填回来。 */
     extraStores: [],
-    /* 圆环版式最多几段（渲染层 SEGMENTS 写死 6 段）。BI 门店数超过它时，
-       多出来的店会被丢掉并打印警告 —— 否则会取到 undefined 直接把看板打崩。
-       真要多加一家店，得同步改 main.js 的 SEGMENTS 和这里的数字。 */
-    maxSegments: 6,
+    /* 圆环版式最多几段（2026-11-13：九星店下线后圆环重排成 5 段，渲染层的
+       SEGMENTS 也只剩 5 个槽位，这里必须同步 —— 否则第 6 家店会取到不存在的
+       弧段/门店框，heroEnter 遍历到 undefined 会抛错）。
+       BI 门店数超过它时，多出来的店会被丢掉并打印警告，汇总指标按剩下的算，
+       保证大屏数字与弧段对得上账。真要多加一家店，得同步改 main.js 的 SEGMENTS。 */
+    maxSegments: 5,
     /* 渠道 chip ↔ BI 表：cum=累计到诊 target=总目标 today=今日到诊（取"合计"行） */
     channels: [
       { name: "网电", file: "web", color: "#d9b876" },
