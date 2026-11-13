@@ -504,6 +504,14 @@
         color: var(--gold-num);
         font-weight: 600;
       }
+      /* 网电 / 市场明细弹窗（2026-11-13 需求）：首列「门店」表头与门店名一起居中。
+         表格其余列都是右对齐的数字，首列靠左时整列看着往外飘，改成居中后与
+         「门店」表头正对；每日业绩表（dt-table）、激励排名表（inc-table）各自
+         有显式对齐规则且不带 sm-table，不受影响。 */
+      .more-table.sm-table th:first-child,
+      .more-table.sm-table td:first-child {
+        text-align: center;
+      }
       .more-table tbody tr:nth-child(even) td {
         background: rgba(255, 255, 255, 0.035);
       }
@@ -997,9 +1005,16 @@
         flex-direction: column;
         gap: 6px;
       }
+      /* 行高自适应（2026-11-13 需求）：数据里去掉「九星店」后每栏只剩 5 家店，
+         原先固定 32px × 6 行＝222px 正好填满面板，现在 5 行只剩 184px，
+         底部空出 38px、看着上挤下空。改成 flex:1 均分：
+         6 行时仍是 32px（222-30 gap）/6 = 32，视觉与改动前完全一致；
+         5 行时每行 39.6px（(222-24)/5），行内两行内容（16+3+7）仍垂直居中，
+         等于把「条形到下一家门店名」的间距从 11px 摊到约 19.6px。
+         min-height 兜住门店变多的情况，行不会被压扁。 */
       .sp-row {
-        flex: none;
-        height: 32px;
+        flex: 1 1 0;
+        min-height: 32px;
         display: grid;
         grid-template-columns: 1fr 52px;
         grid-template-rows: 16px 7px;

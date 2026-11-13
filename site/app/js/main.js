@@ -401,7 +401,11 @@
             return `<tr>${tds}</tr>`;
           })
           .join("");
-        return `<table class="more-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+        /* 2026-11-13 需求：网电 / 市场弹窗的「门店」列居中显示。
+           加 sm-table 只作用于这两类表（tableHTML 只服务 openMore 的 secs 分支），
+           不动 .more-table 的通用首列左对齐 —— 「激励排名」的 inc-table 靠 rowspan
+           合并周次，第 2/3 行的首格是「激励项目」，不能跟着居中。 */
+        return `<table class="more-table sm-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
       };
       const moreMask = $("moreMask");
       /* html 优先：给了就直接当弹窗正文（「激励排名」这类自绘表格用），
