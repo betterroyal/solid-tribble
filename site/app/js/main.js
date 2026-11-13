@@ -819,6 +819,24 @@
           ${remInit}
           ${avgRow}`;
       }
+      /* tooltip 落位（2026-11-13 需求：神华店这类上半圈的弧段，tooltip 会顶到
+         顶部指标卡行上，要整体下移让开）。锚点仍是弧段外侧，但再按「指标卡底边
+         + 8px」兜一次底：tooltip 内容行数不固定（没有平均单体时少一行、高度会变），
+         所以先落位、再量实际高度、再按差值下推，而不是写死偏移量。
+         .arc-tip 用的是 transform: translate(-50%,-100%)，所以 style.top 对应
+         「底边」，上边缘 = top − offsetHeight。 */
+      function placeTip(x, y) {
+        arcTip.style.display = "block";
+        arcTip.style.left = clamp(x, 130, 670) + "px";
+        arcTip.style.top = y - 10 + "px";
+        const kpis = document.querySelector(".kpis");
+        if (!kpis) return;
+        const modTop = heroMod.getBoundingClientRect().top;
+        const limit = kpis.getBoundingClientRect().bottom + 8 - modTop; // 上边缘下限（模块坐标）
+        const top = parseFloat(arcTip.style.top);
+        const over = limit - (top - arcTip.offsetHeight);
+        if (over > 0) arcTip.style.top = top + over + "px";
+      }
       SEGMENTS.slice(0, HERO.length).forEach((seg, i) => {
         hitPaths[i].style.cursor = "pointer";
         hitPaths[i].addEventListener("mouseenter", () => {
@@ -833,9 +851,7 @@
           labels.forEach((l, j) => l.classList.toggle("on", j === i));
           arcTip.innerHTML = tipHTML(heroEntry(i, MODEL));
           const [x, y] = labelTopPx(seg);
-          arcTip.style.display = "block";
-          arcTip.style.left = clamp(x, 130, 670) + "px";
-          arcTip.style.top = y - 10 + "px";
+          placeTip(x, y);
         });
         hitPaths[i].addEventListener("mouseleave", () => {
           heroMod.classList.remove("focus", "dim-others");
