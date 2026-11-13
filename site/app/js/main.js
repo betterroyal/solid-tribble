@@ -833,23 +833,34 @@
           ${remInit}
           ${avgRow}`;
       }
-      /* tooltip 落位（2026-11-13 需求：神华店这类上半圈的弧段，tooltip 会顶到
-         顶部指标卡行上，要整体下移让开）。锚点仍是弧段外侧，但再按「指标卡底边
-         + 8px」兜一次底：tooltip 内容行数不固定（没有平均单体时少一行、高度会变），
-         所以先落位、再量实际高度、再按差值下推，而不是写死偏移量。
-         .arc-tip 用的是 transform: translate(-50%,-100%)，所以 style.top 对应
-         「底边」，上边缘 = top − offsetHeight。 */
-      function placeTip(x, y) {
+      /* tooltip 落位（2026-11-13 需求：神华店浮层要下移，让它覆盖水球的程度
+         与右下角校园店「差不多对称」）。
+         做法：上半圈的浮层翻到锚点【下方】展开（top = 锚点 + 10，transform 换成
+         translate(-50%, 0)）；下半圈维持原样式（底边贴锚点，向上展开）。
+         因为上下弧段的角度关于圆心水平线对称、锚点也关于 CY 对称，翻过来之后
+         盒子恰好与同列下半圈的浮层关于 CY 严格镜像：神华 278.4~419.8 ↔
+         校园 568.4~709.8（CY = 494.1），各盖住水球上下同样一段。
+         ⚠ 只翻了右列顶部（TIP_FLIP）这一个槽：左上的「三级医院」若照此翻转，
+           盒子右缘会压到中央大数字「100.07%」的左边，反而更难看，所以保持
+           原来的「挂在弧段上方」。以后要让它也翻，把 slot 加进这个集合即可。
+         末尾仍按「指标卡底边 + 8px」兜一次底（浮层行数不固定，没有平均单体时
+         少一行、高度会变）：先落位、再量实际位置、再按差值下推，不写死。 */
+      const TIP_FLIP = new Set(["right-top"]);
+      function placeTip(x, y, seg) {
+        const flip = TIP_FLIP.has(seg.slot);
         arcTip.style.display = "block";
         arcTip.style.left = clamp(x, 130, 670) + "px";
-        arcTip.style.top = y - 10 + "px";
+        arcTip.style.transform = flip
+          ? "translate(-50%, 0)" // 顶边贴锚点，向下展开
+          : "translate(-50%, -100%)"; // 底边贴锚点，向上展开（原样式）
+        arcTip.style.top = (flip ? y + 10 : y - 10) + "px";
         const kpis = document.querySelector(".kpis");
         if (!kpis) return;
         const modTop = heroMod.getBoundingClientRect().top;
         const limit = kpis.getBoundingClientRect().bottom + 8 - modTop; // 上边缘下限（模块坐标）
         const top = parseFloat(arcTip.style.top);
-        const over = limit - (top - arcTip.offsetHeight);
-        if (over > 0) arcTip.style.top = top + over + "px";
+        const edge = top - (flip ? 0 : arcTip.offsetHeight); // 实际上边缘
+        if (limit > edge) arcTip.style.top = top + (limit - edge) + "px";
       }
       SEGMENTS.slice(0, HERO.length).forEach((seg, i) => {
         hitPaths[i].style.cursor = "pointer";
@@ -865,7 +876,7 @@
           labels.forEach((l, j) => l.classList.toggle("on", j === i));
           arcTip.innerHTML = tipHTML(heroEntry(i, MODEL));
           const [x, y] = labelTopPx(seg);
-          placeTip(x, y);
+          placeTip(x, y, seg);
         });
         hitPaths[i].addEventListener("mouseleave", () => {
           heroMod.classList.remove("focus", "dim-others");
