@@ -422,7 +422,13 @@
       }
       .modal-box {
         width: 960px;
-        max-height: 82vh;
+        /* 高度上限（2026-11-25 需求）：弹窗挂在 #stage 里，随大屏 1920×1080 等比
+           缩放，所以高度必须用「舞台像素」，不能用 vh —— vh 跟的是浏览器视口，
+           视口一矮（如 1280×720）上限就掉到 590px，网电/老带新两张表放不下，
+           弹窗里就冒出滚动条。改成固定 1000px（舞台 1080 - 上下各 40 留白），
+           内容自然高度 623px 全部显示，任何分辨率下都不再出现滚动条；
+           .modal-body 的 overflow:auto 仍保留，数据行数万一变多才兜底滚动。 */
+        max-height: 1000px;
         display: flex;
         flex-direction: column;
         background: linear-gradient(
