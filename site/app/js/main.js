@@ -171,10 +171,12 @@
       let MODEL = DATA.model;
       /* 底部更新时间 = BI 爬虫写入 JSON 的 updated_at（7 张表里最新的一个）。
          2026-10-18 需求：文案改为「数据更新于 … · 每5分钟自动刷新」，
-         位置从底部居中挪到原来「数据来源」所在的右下角。 */
+         位置从底部居中挪到原来「数据来源」所在的右下角。
+         2026-11-25 需求：去掉「· 每5分钟自动刷新」后缀，只留时间戳。
+         .foot-updated 本来就是 right 定位，文案变短后自动贴到右下角，
+         不需要额外补对齐样式。 */
       const setFoot = (t) =>
-        ($("footUpdated").textContent =
-          "数据更新于 " + (t || "--") + " · 每5分钟自动刷新");
+        ($("footUpdated").textContent = "数据更新于 " + (t || "--"));
       setFoot(DATA.updatedAt);
 
 /* ══════════════════════════════════════════════════════════
@@ -1500,12 +1502,23 @@
       (function initSelect() {
         const sel = $("sel"),
           menu = $("selMenu");
+        /* 菜单顺序（2026-11-25 需求）：「三级医院」提到「神华店」上面（紧跟「全部门店」），
+           其余门店保持 CONFIG.order 原序。
+           ⚠ 只重排这个筛选菜单，不动 STORES 本身 —— 左栏「业绩进度」两栏列表、
+           水球弧段、各排名表都依赖 STORES 的原序，改数据源会连带它们一起错位。 */
+        const SEL_TOPN = ["三级医院"];
+        const selStores = [
+          ...STORES.filter((s) => SEL_TOPN.includes(s.name)),
+          ...STORES.filter((s) => !SEL_TOPN.includes(s.name)),
+        ];
         menu.innerHTML =
           `<li class="all cur" data-key="all"><span class="dot"></span>全部门店</li>` +
-          STORES.map(
-            (s) =>
-              `<li data-key="${s.id}"><span class="dot" style="background:${s.color}"></span>${s.name}</li>`,
-          ).join("");
+          selStores
+            .map(
+              (s) =>
+                `<li data-key="${s.id}"><span class="dot" style="background:${s.color}"></span>${s.name}</li>`,
+            )
+            .join("");
         $("selBtn").addEventListener("click", (e) => {
           e.stopPropagation();
           sel.classList.toggle("open");
